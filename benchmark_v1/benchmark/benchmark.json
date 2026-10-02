@@ -340,8 +340,33 @@
         "documents/controlled/controlled_eagle_endorsement_08.txt"
       ],
       "effective_source": "documents/controlled/controlled_eagle_endorsement_08.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 3500000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 7",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 4250000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 8",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 5000000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 8 deletes and restates Item 2, On Premises, with a USD 5,000,000 single loss limit.",
       "difficulty": "Simple replacement"
     },
     {
@@ -359,8 +384,33 @@
         "documents/controlled/controlled_eagle_endorsement_08.txt"
       ],
       "effective_source": "documents/controlled/controlled_eagle_endorsement_08.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 7",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 8",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 25000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 8 deletes and restates Item 2, On Premises, with a USD 25,000 deductible.",
       "difficulty": "Simple replacement"
     },
     {
@@ -378,8 +428,25 @@
         "documents/controlled/controlled_popular_rider_18.txt"
       ],
       "effective_source": "documents/controlled/controlled_popular_rider_18.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Rider 17",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-06-30T12:00:00"
+          }
+        },
+        {
+          "source": "Rider 18",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-09-30T12:00:00"
+          }
+        }
+      ],
+      "required_evidence": "Rider 18 amends Item 2 Bond Period to end 30 September 2027 at 12:00 noon, with inception remaining 30 June 2026 at 12:00 noon.",
       "difficulty": "Simple period amendment"
     },
     {
@@ -397,8 +464,41 @@
         "documents/controlled/controlled_jpm_endorsements_08_09.txt"
       ],
       "effective_source": "documents/controlled/controlled_jpm_endorsements_08_09.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 1250000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 2",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 1775000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 8",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 2000000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 9",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 2500000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 8 restates the On Premises limit to USD 2,000,000; Endorsement 9 later restates it to USD 2,500,000.",
       "difficulty": "Two sequential replacements"
     },
     {
@@ -416,8 +516,41 @@
         "documents/controlled/controlled_jpm_endorsements_08_09.txt"
       ],
       "effective_source": "documents/controlled/controlled_jpm_endorsements_08_09.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 2",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 8",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 25000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 9",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 50000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 8 restates the On Premises deductible to USD 25,000; Endorsement 9 later restates it to USD 50,000.",
       "difficulty": "Two sequential replacements"
     },
     {
@@ -435,8 +568,33 @@
         "documents/controlled/controlled_popular_riders_18_19.txt"
       ],
       "effective_source": "documents/controlled/controlled_popular_riders_18_19.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Rider 17",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-06-30T12:00:00"
+          }
+        },
+        {
+          "source": "Rider 18",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-09-30T12:00:00"
+          }
+        },
+        {
+          "source": "Rider 19",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-12-31T12:00:00"
+          }
+        }
+      ],
+      "required_evidence": "Rider 18 amends expiration to 30 September 2027; Rider 19 further amends expiration to 31 December 2027; inception remains 30 June 2026.",
       "difficulty": "Sequential date amendments"
     },
     {
@@ -454,8 +612,17 @@
         "documents/controlled/controlled_eagle_endorsement_08_cyber.txt"
       ],
       "effective_source": "documents/controlled/controlled_eagle_endorsement_08_cyber.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Endorsement 8",
+          "operation": "ADD",
+          "value": {
+            "amount": 750000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 8 adds Cyber Fraud with a USD 750,000 single loss limit.",
       "difficulty": "New term"
     },
     {
@@ -473,8 +640,17 @@
         "documents/controlled/controlled_eagle_endorsement_08_cyber.txt"
       ],
       "effective_source": "documents/controlled/controlled_eagle_endorsement_08_cyber.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Endorsement 8",
+          "operation": "ADD",
+          "value": {
+            "amount": 15000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 8 adds Cyber Fraud with a USD 15,000 deductible.",
       "difficulty": "New term"
     },
     {
@@ -489,11 +665,45 @@
       },
       "contract_stack": [
         "documents/authentic/popular/popular_family_2026_2027_bond.pdf",
+        "documents/controlled/controlled_popular_riders_18_19.txt",
         "documents/controlled/controlled_popular_rider_20_partial.txt"
       ],
       "effective_source": "documents/controlled/controlled_popular_rider_20_partial.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Rider 17",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-06-30T12:00:00"
+          }
+        },
+        {
+          "source": "Rider 18",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-09-30T12:00:00"
+          }
+        },
+        {
+          "source": "Rider 19",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-12-31T12:00:00"
+          }
+        },
+        {
+          "source": "Rider 20",
+          "operation": "AMEND",
+          "value": {
+            "start": "2027-03-01T12:00:00",
+            "end": "2027-12-31T12:00:00"
+          }
+        }
+      ],
+      "required_evidence": "Riders 18 and 19 establish an expiration of 31 December 2027; Rider 20 amends only inception to 1 March 2027 and expressly leaves that expiration unchanged.",
       "difficulty": "Partial amendment"
     },
     {
@@ -511,8 +721,33 @@
         "documents/controlled/controlled_eagle_endorsements_08_09_noise.txt"
       ],
       "effective_source": "documents/controlled/controlled_eagle_endorsements_08_09_noise.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 3500000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 7",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 4250000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 9",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 6000000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 8 is irrelevant to limit/deductible; Endorsement 9 deletes and restates the On Premises limit as USD 6,000,000.",
       "difficulty": "Retrieval noise"
     },
     {
@@ -530,8 +765,33 @@
         "documents/controlled/controlled_jpm_endorsements_08_09_10_11_noise.txt"
       ],
       "effective_source": "documents/controlled/controlled_jpm_endorsements_08_09_10_11_noise.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 2",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 11",
+          "operation": "REPLACE",
+          "value": {
+            "amount": 30000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsements 8\u201310 are irrelevant to the On Premises deductible; Endorsement 11 deletes and replaces it with USD 30,000.",
       "difficulty": "Retrieval noise"
     },
     {
@@ -549,8 +809,25 @@
         "documents/controlled/controlled_popular_riders_noise_18_21.txt"
       ],
       "effective_source": "documents/controlled/controlled_popular_riders_noise_18_21.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Rider 17",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-06-30T12:00:00"
+          }
+        },
+        {
+          "source": "Rider 21",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2028-03-31T12:00:00"
+          }
+        }
+      ],
+      "required_evidence": "Riders 18\u201320 are irrelevant to the Bond Period; Rider 21 amends expiration to 31 March 2028 while inception remains 30 June 2026.",
       "difficulty": "Retrieval noise"
     },
     {
@@ -568,8 +845,41 @@
         "documents/controlled/controlled_jpm_endorsements_08_11_supersede.txt"
       ],
       "effective_source": "documents/controlled/controlled_jpm_endorsements_08_11_supersede.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 1250000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 2",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 1775000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 8",
+          "operation": "REPLACE",
+          "value": {
+            "amount": 3000000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 11",
+          "operation": "SUPERSEDE",
+          "value": {
+            "amount": 2250000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 8 replaces the On Premises limit with USD 3,000,000; Endorsement 11 explicitly supersedes Endorsement 8 as to that limit and makes USD 2,250,000 operative.",
       "difficulty": "Explicit supersession"
     },
     {
@@ -587,8 +897,41 @@
         "documents/controlled/controlled_jpm_endorsements_08_12_supersede.txt"
       ],
       "effective_source": "documents/controlled/controlled_jpm_endorsements_08_12_supersede.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 2",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 8",
+          "operation": "REPLACE",
+          "value": {
+            "amount": 40000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 12",
+          "operation": "SUPERSEDE",
+          "value": {
+            "amount": 20000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 8 replaces the On Premises deductible with USD 40,000; Endorsement 12 explicitly supersedes Endorsement 8 as to that deductible and makes USD 20,000 operative.",
       "difficulty": "Explicit supersession"
     },
     {
@@ -606,8 +949,33 @@
         "documents/controlled/controlled_popular_riders_18_21_supersede.txt"
       ],
       "effective_source": "documents/controlled/controlled_popular_riders_18_21_supersede.txt",
-      "amendment_chain": [],
-      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "amendment_chain": [
+        {
+          "source": "Rider 17",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-06-30T12:00:00"
+          }
+        },
+        {
+          "source": "Rider 18",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-09-30T12:00:00"
+          }
+        },
+        {
+          "source": "Rider 21",
+          "operation": "SUPERSEDE",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-08-31T12:00:00"
+          }
+        }
+      ],
+      "required_evidence": "Rider 18 amends expiration to 30 September 2027; Rider 21 explicitly supersedes Rider 18 as to the Bond Period and makes expiration 31 August 2027, with inception unchanged.",
       "difficulty": "Explicit supersession"
     },
     {
