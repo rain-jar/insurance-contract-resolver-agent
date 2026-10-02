@@ -1,0 +1,5 @@
+SYNTHETIC CONTROLLED ENDORSEMENTS — NOT AUTHENTIC INSURANCE DOCUMENTS
+source_type: synthetic_controlled
+derived_from: eagle_point_2024_2025_bond.pdf
+Endorsement 8: Schedule of mailing addresses is amended. No limit or deductible is changed.
+Endorsement 9: Item 2, On Premises, is deleted and restated. Single Loss Limit of Liability: USD 6,000,000. Deductible unchanged.

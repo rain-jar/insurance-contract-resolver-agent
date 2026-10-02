@@ -1,0 +1,8 @@
+SYNTHETIC ADVERSARIAL CASE NOTE — NOT AN AUTHENTIC INSURANCE DOCUMENT
+source_type: synthetic_adversarial
+derived_from: popular_family_2026_2027_bond.pdf
+For benchmark testing only.
+
+The benchmark question asks for TERRITORIAL_COVERAGE.
+Benchmark v1 supports only LIMIT, DEDUCTIBLE, and POLICY_PERIOD.
+The resolver must not silently reinterpret this request as one of the supported attributes.

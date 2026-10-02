@@ -1,0 +1,694 @@
+{
+  "benchmark_version": "1.0",
+  "case_count": 30,
+  "supported_attributes": [
+    "LIMIT",
+    "DEDUCTIBLE",
+    "POLICY_PERIOD"
+  ],
+  "cases": [
+    {
+      "case_id": "A01",
+      "case_type": "authentic",
+      "attribute": "LIMIT",
+      "question": "What is the current On Premises single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 4250000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf"
+      ],
+      "effective_source": "Endorsement 7 \u2014 Amend Item 2",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 3500000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 7",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 4250000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 7 deletes and restates Item 2; On Premises limit is $4,250,000.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "A02",
+      "case_type": "authentic",
+      "attribute": "LIMIT",
+      "question": "What is the current Forgery Or Alteration single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 4250000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf"
+      ],
+      "effective_source": "Endorsement 7 \u2014 Amend Item 2",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 3500000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 7",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 4250000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 7 deletes and restates Item 2; Forgery Or Alteration limit is $4,250,000.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "A03",
+      "case_type": "authentic",
+      "attribute": "DEDUCTIBLE",
+      "question": "What is the current On Premises deductible?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 10000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf"
+      ],
+      "effective_source": "Endorsement 7 \u2014 Amend Item 2",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 7",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 7 restates Item 2 and keeps the On Premises deductible at $10,000.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "A04",
+      "case_type": "authentic",
+      "attribute": "LIMIT",
+      "question": "What is the current On Premises single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 1775000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html"
+      ],
+      "effective_source": "Endorsement 2 \u2014 Amend Item 2",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 1250000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 2",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 1775000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 2 deletes and restates Item 2; On Premises limit is $1,775,000.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "A05",
+      "case_type": "authentic",
+      "attribute": "LIMIT",
+      "question": "What is the current Computer System Fraud single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 1775000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html"
+      ],
+      "effective_source": "Endorsement 2 \u2014 Amend Item 2",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 1250000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 2",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 1775000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 2 deletes and restates Item 2; Computer System Fraud limit is $1,775,000.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "A06",
+      "case_type": "authentic",
+      "attribute": "DEDUCTIBLE",
+      "question": "What is the current Computer System Fraud deductible?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 10000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html"
+      ],
+      "effective_source": "Endorsement 2 \u2014 Amend Item 2",
+      "amendment_chain": [
+        {
+          "source": "Base declarations Item 2",
+          "operation": "BASE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        },
+        {
+          "source": "Endorsement 2",
+          "operation": "DELETE_AND_RESTATE",
+          "value": {
+            "amount": 10000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 2 restates Item 2 and keeps the Computer System Fraud deductible at $10,000.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "A07",
+      "case_type": "authentic",
+      "attribute": "LIMIT",
+      "question": "What is the current Fraudulent Transfer Instruction single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 50125000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/blackrock/blackrock_multi_asset_2024_2025_bond.html"
+      ],
+      "effective_source": "Endorsement 3 \u2014 Fraudulent Transfer Instruction",
+      "amendment_chain": [
+        {
+          "source": "Endorsement 3",
+          "operation": "ADD",
+          "value": {
+            "amount": 50125000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "The endorsement adds Fraudulent Transfer Instruction to Item 2 with a $50,125,000 limit.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "A08",
+      "case_type": "authentic",
+      "attribute": "LIMIT",
+      "question": "What is the current Stop Payment Order single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 50125000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/blackrock/blackrock_multi_asset_2024_2025_bond.html"
+      ],
+      "effective_source": "Endorsement 5 \u2014 Stop Payment Order or Refusal to Pay Check",
+      "amendment_chain": [
+        {
+          "source": "Endorsement 5",
+          "operation": "ADD",
+          "value": {
+            "amount": 50125000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 5 adds Stop Payment Order to Item 2 with a $50,125,000 limit.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "A09",
+      "case_type": "authentic",
+      "attribute": "DEDUCTIBLE",
+      "question": "What is the current Unauthorized Signature deductible?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 25000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/blackrock/blackrock_multi_asset_2024_2025_bond.html"
+      ],
+      "effective_source": "Endorsement 6 \u2014 Unauthorized Signature",
+      "amendment_chain": [
+        {
+          "source": "Endorsement 6",
+          "operation": "ADD",
+          "value": {
+            "amount": 25000,
+            "currency": "USD"
+          }
+        }
+      ],
+      "required_evidence": "Endorsement 6 adds Unauthorized Signature to Item 2 with a $25,000 deductible.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "A10",
+      "case_type": "authentic",
+      "attribute": "POLICY_PERIOD",
+      "question": "What is the current policy period?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "start": "2026-06-30T12:00:00",
+        "end": "2027-06-30T12:00:00"
+      },
+      "contract_stack": [
+        "documents/authentic/popular/popular_family_2026_2027_bond.pdf"
+      ],
+      "effective_source": "Rider 17 \u2014 Bond Period amendment",
+      "amendment_chain": [
+        {
+          "source": "Rider 17",
+          "operation": "AMEND",
+          "value": {
+            "start": "2026-06-30T12:00:00",
+            "end": "2027-06-30T12:00:00"
+          }
+        }
+      ],
+      "required_evidence": "Rider 17 states the amended Bond Period runs from June 30, 2026 at 12 noon to June 30, 2027 at 12 noon.",
+      "difficulty": "authentic"
+    },
+    {
+      "case_id": "C01",
+      "case_type": "controlled",
+      "attribute": "LIMIT",
+      "question": "What is the current On Premises single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 5000000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+        "documents/controlled/controlled_eagle_endorsement_08.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_eagle_endorsement_08.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Simple replacement"
+    },
+    {
+      "case_id": "C02",
+      "case_type": "controlled",
+      "attribute": "DEDUCTIBLE",
+      "question": "What is the current On Premises deductible?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 25000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+        "documents/controlled/controlled_eagle_endorsement_08.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_eagle_endorsement_08.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Simple replacement"
+    },
+    {
+      "case_id": "C03",
+      "case_type": "controlled",
+      "attribute": "POLICY_PERIOD",
+      "question": "What is the current policy period?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "start": "2026-06-30T12:00:00",
+        "end": "2027-09-30T12:00:00"
+      },
+      "contract_stack": [
+        "documents/authentic/popular/popular_family_2026_2027_bond.pdf",
+        "documents/controlled/controlled_popular_rider_18.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_popular_rider_18.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Simple period amendment"
+    },
+    {
+      "case_id": "C04",
+      "case_type": "controlled",
+      "attribute": "LIMIT",
+      "question": "What is the current On Premises single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 2500000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html",
+        "documents/controlled/controlled_jpm_endorsements_08_09.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_jpm_endorsements_08_09.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Two sequential replacements"
+    },
+    {
+      "case_id": "C05",
+      "case_type": "controlled",
+      "attribute": "DEDUCTIBLE",
+      "question": "What is the current On Premises deductible?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 50000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html",
+        "documents/controlled/controlled_jpm_endorsements_08_09.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_jpm_endorsements_08_09.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Two sequential replacements"
+    },
+    {
+      "case_id": "C06",
+      "case_type": "controlled",
+      "attribute": "POLICY_PERIOD",
+      "question": "What is the current policy period?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "start": "2026-06-30T12:00:00",
+        "end": "2027-12-31T12:00:00"
+      },
+      "contract_stack": [
+        "documents/authentic/popular/popular_family_2026_2027_bond.pdf",
+        "documents/controlled/controlled_popular_riders_18_19.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_popular_riders_18_19.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Sequential date amendments"
+    },
+    {
+      "case_id": "C07",
+      "case_type": "controlled",
+      "attribute": "LIMIT",
+      "question": "What is the current Cyber Fraud single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 750000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+        "documents/controlled/controlled_eagle_endorsement_08_cyber.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_eagle_endorsement_08_cyber.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "New term"
+    },
+    {
+      "case_id": "C08",
+      "case_type": "controlled",
+      "attribute": "DEDUCTIBLE",
+      "question": "What is the current Cyber Fraud deductible?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 15000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+        "documents/controlled/controlled_eagle_endorsement_08_cyber.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_eagle_endorsement_08_cyber.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "New term"
+    },
+    {
+      "case_id": "C09",
+      "case_type": "controlled",
+      "attribute": "POLICY_PERIOD",
+      "question": "What is the current policy period?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "start": "2027-03-01T12:00:00",
+        "end": "2027-12-31T12:00:00"
+      },
+      "contract_stack": [
+        "documents/authentic/popular/popular_family_2026_2027_bond.pdf",
+        "documents/controlled/controlled_popular_rider_20_partial.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_popular_rider_20_partial.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Partial amendment"
+    },
+    {
+      "case_id": "C10",
+      "case_type": "controlled",
+      "attribute": "LIMIT",
+      "question": "What is the current On Premises single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 6000000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+        "documents/controlled/controlled_eagle_endorsements_08_09_noise.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_eagle_endorsements_08_09_noise.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Retrieval noise"
+    },
+    {
+      "case_id": "C11",
+      "case_type": "controlled",
+      "attribute": "DEDUCTIBLE",
+      "question": "What is the current On Premises deductible?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 30000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html",
+        "documents/controlled/controlled_jpm_endorsements_08_09_10_11_noise.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_jpm_endorsements_08_09_10_11_noise.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Retrieval noise"
+    },
+    {
+      "case_id": "C12",
+      "case_type": "controlled",
+      "attribute": "POLICY_PERIOD",
+      "question": "What is the current policy period?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "start": "2026-06-30T12:00:00",
+        "end": "2028-03-31T12:00:00"
+      },
+      "contract_stack": [
+        "documents/authentic/popular/popular_family_2026_2027_bond.pdf",
+        "documents/controlled/controlled_popular_riders_noise_18_21.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_popular_riders_noise_18_21.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Retrieval noise"
+    },
+    {
+      "case_id": "C13",
+      "case_type": "controlled",
+      "attribute": "LIMIT",
+      "question": "What is the current On Premises single loss limit?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 2250000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html",
+        "documents/controlled/controlled_jpm_endorsements_08_11_supersede.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_jpm_endorsements_08_11_supersede.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Explicit supersession"
+    },
+    {
+      "case_id": "C14",
+      "case_type": "controlled",
+      "attribute": "DEDUCTIBLE",
+      "question": "What is the current On Premises deductible?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "amount": 20000,
+        "currency": "USD"
+      },
+      "contract_stack": [
+        "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html",
+        "documents/controlled/controlled_jpm_endorsements_08_12_supersede.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_jpm_endorsements_08_12_supersede.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Explicit supersession"
+    },
+    {
+      "case_id": "C15",
+      "case_type": "controlled",
+      "attribute": "POLICY_PERIOD",
+      "question": "What is the current policy period?",
+      "expected_behavior": "ANSWER",
+      "expected_answer": {
+        "start": "2026-06-30T12:00:00",
+        "end": "2027-08-31T12:00:00"
+      },
+      "contract_stack": [
+        "documents/authentic/popular/popular_family_2026_2027_bond.pdf",
+        "documents/controlled/controlled_popular_riders_18_21_supersede.txt"
+      ],
+      "effective_source": "documents/controlled/controlled_popular_riders_18_21_supersede.txt",
+      "amendment_chain": [],
+      "required_evidence": "See synthetic controlled document; exact amendment language is the benchmark evidence.",
+      "difficulty": "Explicit supersession"
+    },
+    {
+      "case_id": "ADV01",
+      "case_type": "adversarial",
+      "attribute": "LIMIT",
+      "question": "What is the current On Premises single loss limit?",
+      "expected_behavior": "INSUFFICIENT_EVIDENCE",
+      "expected_answer": null,
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+        "documents/adversarial/ADV01_conflicting_limit.txt"
+      ],
+      "effective_source": null,
+      "amendment_chain": [],
+      "required_evidence": "Two conflicting candidate values exist with no supplied precedence information.",
+      "difficulty": "ambiguous precedence"
+    },
+    {
+      "case_id": "ADV02",
+      "case_type": "adversarial",
+      "attribute": "DEDUCTIBLE",
+      "question": "What is the current On Premises deductible?",
+      "expected_behavior": "INSUFFICIENT_EVIDENCE",
+      "expected_answer": null,
+      "contract_stack": [
+        "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html",
+        "documents/adversarial/ADV02_missing_deductible_value.txt"
+      ],
+      "effective_source": null,
+      "amendment_chain": [],
+      "required_evidence": "Prior deductible is deleted; replacement amount is in a missing Schedule A.",
+      "difficulty": "missing replacement value"
+    },
+    {
+      "case_id": "ADV03",
+      "case_type": "adversarial",
+      "attribute": "LIMIT",
+      "question": "What is the current On Premises single loss limit?",
+      "expected_behavior": "INSUFFICIENT_EVIDENCE",
+      "expected_answer": null,
+      "contract_stack": [
+        "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+        "documents/adversarial/ADV03_missing_referenced_endorsement.txt"
+      ],
+      "effective_source": null,
+      "amendment_chain": [],
+      "required_evidence": "Supplied endorsement delegates the controlling amount to an absent endorsement.",
+      "difficulty": "missing referenced document"
+    },
+    {
+      "case_id": "ADV04",
+      "case_type": "adversarial",
+      "attribute": "POLICY_PERIOD",
+      "question": "What is the current policy period?",
+      "expected_behavior": "INSUFFICIENT_EVIDENCE",
+      "expected_answer": null,
+      "contract_stack": [
+        "documents/authentic/popular/popular_family_2026_2027_bond.pdf",
+        "documents/adversarial/ADV04_conflicting_policy_period.txt"
+      ],
+      "effective_source": null,
+      "amendment_chain": [],
+      "required_evidence": "Two conflicting expiration dates exist with no supplied precedence information.",
+      "difficulty": "ambiguous precedence"
+    },
+    {
+      "case_id": "ADV05",
+      "case_type": "adversarial",
+      "attribute": "TERRITORIAL_COVERAGE",
+      "question": "What is the current territorial coverage?",
+      "expected_behavior": "UNSUPPORTED_ATTRIBUTE",
+      "expected_answer": null,
+      "contract_stack": [
+        "documents/authentic/popular/popular_family_2026_2027_bond.pdf",
+        "documents/adversarial/ADV05_unsupported_attribute.txt"
+      ],
+      "effective_source": null,
+      "amendment_chain": [],
+      "required_evidence": "Benchmark v1 ontology supports LIMIT, DEDUCTIBLE, and POLICY_PERIOD only.",
+      "difficulty": "unsupported ontology"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+SYNTHETIC CONTROLLED ENDORSEMENTS — NOT AUTHENTIC INSURANCE DOCUMENTS
+source_type: synthetic_controlled
+derived_from: jpmorgan_private_markets_2025_2026_bond.html
+Endorsement 8: Named Assured mailing address amended.
+Endorsement 9: Notice provision amended.
+Endorsement 10: Definition of Employee amended.
+Endorsement 11: Item 2, On Premises deductible is deleted and replaced with USD 30,000. Limit unchanged.

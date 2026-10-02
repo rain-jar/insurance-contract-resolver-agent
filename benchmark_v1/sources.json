@@ -1,0 +1,37 @@
+{
+  "version": "benchmark_v1",
+  "sources": [
+    {
+      "source_id": "eagle_point_2024_2025",
+      "entity": "Eagle Point Credit Company Inc",
+      "format": "pdf",
+      "local_path": "documents/authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+      "url": "https://www.sec.gov/Archives/edgar/data/1992148/000110465925069985/tm2521531d1_4017g.pdf",
+      "verified_features": ["Endorsement 7", "Item 2 deleted and restated", "On Premises limit 4250000 USD", "On Premises deductible 10000 USD"]
+    },
+    {
+      "source_id": "jpmorgan_private_markets_2025_2026",
+      "entity": "JPMorgan Private Markets Fund",
+      "format": "html",
+      "local_path": "documents/authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html",
+      "url": "https://www.sec.gov/Archives/edgar/data/2056164/000119312525323763/d15570d4017g.htm",
+      "verified_features": ["Base Item 2 limit 1250000 USD", "Endorsement 2 deletes and restates Item 2", "On Premises and Computer System Fraud limit 1775000 USD", "deductible 10000 USD"]
+    },
+    {
+      "source_id": "blackrock_multi_asset_2024_2025",
+      "entity": "BlackRock Multi-Asset Complex Board",
+      "format": "html",
+      "local_path": "documents/authentic/blackrock/blackrock_multi_asset_2024_2025_bond.html",
+      "url": "https://www.sec.gov/Archives/edgar/data/97098/000119312525025906/d928362d4017g.htm",
+      "verified_features": ["Endorsement 3 adds Fraudulent Transfer Instruction 50125000 USD", "Endorsement 5 adds Stop Payment Order 50125000 USD", "Endorsement 6 adds Unauthorized Signature with 25000 USD deductible"]
+    },
+    {
+      "source_id": "popular_family_2026_2027",
+      "entity": "Popular Family of Funds",
+      "format": "pdf",
+      "local_path": "documents/authentic/popular/popular_family_2026_2027_bond.pdf",
+      "url": "https://www.sec.gov/Archives/edgar/data/1862970/000139834426015733/fp0100636-2_4017g.pdf",
+      "verified_features": ["Rider 17", "Item 2 Bond Period amended", "2026-06-30 12:00 noon to 2027-06-30 12:00 noon"]
+    }
+  ]
+}

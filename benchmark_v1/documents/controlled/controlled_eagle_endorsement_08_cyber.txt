@@ -1,0 +1,8 @@
+SYNTHETIC CONTROLLED ENDORSEMENT — NOT AN AUTHENTIC INSURANCE DOCUMENT
+source_type: synthetic_controlled
+derived_from: eagle_point_2024_2025_bond.pdf
+Endorsement 8
+A new insuring clause, Cyber Fraud, is added.
+Single Loss Limit of Liability: USD 750,000.
+Deductible Amount: USD 15,000.
+All other terms remain unchanged.

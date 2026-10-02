@@ -1,0 +1,9 @@
+SYNTHETIC CONTROLLED ENDORSEMENT — NOT AN AUTHENTIC INSURANCE DOCUMENT
+source_type: synthetic_controlled
+derived_from: eagle_point_2024_2025_bond.pdf
+Endorsement Number: 8
+For benchmark testing only.
+Item 2, On Premises, is deleted and restated as follows:
+Single Loss Limit of Liability: USD 5,000,000.
+Deductible Amount: USD 25,000.
+All other terms remain unchanged.

@@ -1,0 +1,6 @@
+SYNTHETIC CONTROLLED ENDORSEMENTS — NOT AUTHENTIC INSURANCE DOCUMENTS
+source_type: synthetic_controlled
+derived_from: jpmorgan_private_markets_2025_2026_bond.html
+Endorsement 8: Item 2, On Premises, is deleted and restated: Limit USD 2,000,000; Deductible USD 25,000.
+Endorsement 9: Item 2, On Premises, is deleted and restated: Limit USD 2,500,000; Deductible USD 50,000.
+All other terms remain unchanged.

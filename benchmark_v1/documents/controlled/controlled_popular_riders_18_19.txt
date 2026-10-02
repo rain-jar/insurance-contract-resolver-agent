@@ -1,0 +1,6 @@
+SYNTHETIC CONTROLLED RIDERS — NOT AUTHENTIC INSURANCE DOCUMENTS
+source_type: synthetic_controlled
+derived_from: popular_family_2026_2027_bond.pdf
+Rider 18: Item 2 Bond Period is amended so the expiration is 30 September 2027 at 12:00 noon.
+Rider 19: Item 2 Bond Period is further amended so the expiration is 31 December 2027 at 12:00 noon.
+The inception remains 30 June 2026 at 12:00 noon.

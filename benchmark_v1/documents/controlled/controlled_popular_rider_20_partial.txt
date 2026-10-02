@@ -1,0 +1,6 @@
+SYNTHETIC CONTROLLED RIDER — NOT AN AUTHENTIC INSURANCE DOCUMENT
+source_type: synthetic_controlled
+derived_from: popular_family_2026_2027_bond.pdf
+Benchmark precondition: Rider 19 has already established an expiration of 31 December 2027 at 12:00 noon.
+Rider 20: Item 2 Bond Period is amended ONLY as to inception date. Inception is replaced by 1 March 2027 at 12:00 noon.
+The existing expiration date is not amended and remains 31 December 2027 at 12:00 noon.

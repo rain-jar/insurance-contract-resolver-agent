@@ -1,0 +1,242 @@
+[
+  {
+    "case_id": "C01",
+    "case_type": "controlled",
+    "attribute": "LIMIT",
+    "question": "What is the current On Premises single loss limit?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 5,000,000",
+    "contract_stack": [
+      "authentic/eagle_point_2024_2025_bond.pdf",
+      "controlled/controlled_eagle_endorsement_08.txt"
+    ],
+    "synthetic_source": "controlled/controlled_eagle_endorsement_08.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/eagle_point_2024_2025_bond.pdf",
+    "main_test": "Simple replacement"
+  },
+  {
+    "case_id": "C02",
+    "case_type": "controlled",
+    "attribute": "DEDUCTIBLE",
+    "question": "What is the current On Premises deductible?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 25,000",
+    "contract_stack": [
+      "authentic/eagle_point_2024_2025_bond.pdf",
+      "controlled/controlled_eagle_endorsement_08.txt"
+    ],
+    "synthetic_source": "controlled/controlled_eagle_endorsement_08.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/eagle_point_2024_2025_bond.pdf",
+    "main_test": "Simple replacement"
+  },
+  {
+    "case_id": "C03",
+    "case_type": "controlled",
+    "attribute": "POLICY_PERIOD",
+    "question": "What is the current policy period?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "2026-06-30 12:00 to 2027-09-30 12:00",
+    "contract_stack": [
+      "authentic/popular_family_2026_2027_bond.pdf",
+      "controlled/controlled_popular_rider_18.txt"
+    ],
+    "synthetic_source": "controlled/controlled_popular_rider_18.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/popular_family_2026_2027_bond.pdf",
+    "main_test": "Simple period amendment"
+  },
+  {
+    "case_id": "C04",
+    "case_type": "controlled",
+    "attribute": "LIMIT",
+    "question": "What is the current On Premises single loss limit?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 2,500,000",
+    "contract_stack": [
+      "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+      "controlled/controlled_jpm_endorsements_08_09.txt"
+    ],
+    "synthetic_source": "controlled/controlled_jpm_endorsements_08_09.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+    "main_test": "Two sequential replacements"
+  },
+  {
+    "case_id": "C05",
+    "case_type": "controlled",
+    "attribute": "DEDUCTIBLE",
+    "question": "What is the current On Premises deductible?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 50,000",
+    "contract_stack": [
+      "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+      "controlled/controlled_jpm_endorsements_08_09.txt"
+    ],
+    "synthetic_source": "controlled/controlled_jpm_endorsements_08_09.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+    "main_test": "Two sequential replacements"
+  },
+  {
+    "case_id": "C06",
+    "case_type": "controlled",
+    "attribute": "POLICY_PERIOD",
+    "question": "What is the current policy period?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "2026-06-30 12:00 to 2027-12-31 12:00",
+    "contract_stack": [
+      "authentic/popular_family_2026_2027_bond.pdf",
+      "controlled/controlled_popular_riders_18_19.txt"
+    ],
+    "synthetic_source": "controlled/controlled_popular_riders_18_19.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/popular_family_2026_2027_bond.pdf",
+    "main_test": "Sequential date amendments"
+  },
+  {
+    "case_id": "C07",
+    "case_type": "controlled",
+    "attribute": "LIMIT",
+    "question": "What is the current Cyber Fraud single loss limit?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 750,000",
+    "contract_stack": [
+      "authentic/eagle_point_2024_2025_bond.pdf",
+      "controlled/controlled_eagle_endorsement_08_cyber.txt"
+    ],
+    "synthetic_source": "controlled/controlled_eagle_endorsement_08_cyber.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/eagle_point_2024_2025_bond.pdf",
+    "main_test": "New term added"
+  },
+  {
+    "case_id": "C08",
+    "case_type": "controlled",
+    "attribute": "DEDUCTIBLE",
+    "question": "What is the current Cyber Fraud deductible?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 15,000",
+    "contract_stack": [
+      "authentic/eagle_point_2024_2025_bond.pdf",
+      "controlled/controlled_eagle_endorsement_08_cyber.txt"
+    ],
+    "synthetic_source": "controlled/controlled_eagle_endorsement_08_cyber.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/eagle_point_2024_2025_bond.pdf",
+    "main_test": "New term added"
+  },
+  {
+    "case_id": "C09",
+    "case_type": "controlled",
+    "attribute": "POLICY_PERIOD",
+    "question": "What is the current policy period?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "2027-03-01 12:00 to 2027-12-31 12:00",
+    "contract_stack": [
+      "authentic/popular_family_2026_2027_bond.pdf",
+      "controlled/controlled_popular_rider_20_partial.txt"
+    ],
+    "synthetic_source": "controlled/controlled_popular_rider_20_partial.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/popular_family_2026_2027_bond.pdf",
+    "main_test": "Partial state update"
+  },
+  {
+    "case_id": "C10",
+    "case_type": "controlled",
+    "attribute": "LIMIT",
+    "question": "What is the current On Premises single loss limit?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 6,000,000",
+    "contract_stack": [
+      "authentic/eagle_point_2024_2025_bond.pdf",
+      "controlled/controlled_eagle_endorsements_08_09_noise.txt"
+    ],
+    "synthetic_source": "controlled/controlled_eagle_endorsements_08_09_noise.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/eagle_point_2024_2025_bond.pdf",
+    "main_test": "Retrieval noise"
+  },
+  {
+    "case_id": "C11",
+    "case_type": "controlled",
+    "attribute": "DEDUCTIBLE",
+    "question": "What is the current On Premises deductible?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 30,000",
+    "contract_stack": [
+      "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+      "controlled/controlled_jpm_endorsements_08_09_10_11_noise.txt"
+    ],
+    "synthetic_source": "controlled/controlled_jpm_endorsements_08_09_10_11_noise.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+    "main_test": "Retrieval noise"
+  },
+  {
+    "case_id": "C12",
+    "case_type": "controlled",
+    "attribute": "POLICY_PERIOD",
+    "question": "What is the current policy period?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "2026-06-30 12:00 to 2028-03-31 12:00",
+    "contract_stack": [
+      "authentic/popular_family_2026_2027_bond.pdf",
+      "controlled/controlled_popular_riders_noise_18_21.txt"
+    ],
+    "synthetic_source": "controlled/controlled_popular_riders_noise_18_21.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/popular_family_2026_2027_bond.pdf",
+    "main_test": "Retrieval noise"
+  },
+  {
+    "case_id": "C13",
+    "case_type": "controlled",
+    "attribute": "LIMIT",
+    "question": "What is the current On Premises single loss limit?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 2,250,000",
+    "contract_stack": [
+      "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+      "controlled/controlled_jpm_endorsements_08_11_supersede.txt"
+    ],
+    "synthetic_source": "controlled/controlled_jpm_endorsements_08_11_supersede.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+    "main_test": "Explicit supersession"
+  },
+  {
+    "case_id": "C14",
+    "case_type": "controlled",
+    "attribute": "DEDUCTIBLE",
+    "question": "What is the current On Premises deductible?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "USD 20,000",
+    "contract_stack": [
+      "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+      "controlled/controlled_jpm_endorsements_08_12_supersede.txt"
+    ],
+    "synthetic_source": "controlled/controlled_jpm_endorsements_08_12_supersede.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/jpmorgan_private_markets_2025_2026_bond.html",
+    "main_test": "Explicit supersession"
+  },
+  {
+    "case_id": "C15",
+    "case_type": "controlled",
+    "attribute": "POLICY_PERIOD",
+    "question": "What is the current policy period?",
+    "expected_behavior": "ANSWER",
+    "expected_answer": "2026-06-30 12:00 to 2027-08-31 12:00",
+    "contract_stack": [
+      "authentic/popular_family_2026_2027_bond.pdf",
+      "controlled/controlled_popular_riders_18_21_supersede.txt"
+    ],
+    "synthetic_source": "controlled/controlled_popular_riders_18_21_supersede.txt",
+    "source_type": "synthetic_controlled",
+    "derived_from": "authentic/popular_family_2026_2027_bond.pdf",
+    "main_test": "Explicit supersession"
+  }
+]

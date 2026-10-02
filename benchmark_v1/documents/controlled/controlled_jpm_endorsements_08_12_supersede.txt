@@ -1,0 +1,5 @@
+SYNTHETIC CONTROLLED ENDORSEMENTS — NOT AUTHENTIC INSURANCE DOCUMENTS
+source_type: synthetic_controlled
+derived_from: jpmorgan_private_markets_2025_2026_bond.html
+Endorsement 8: On Premises deductible is replaced with USD 40,000.
+Endorsement 12: Endorsement 8 is hereby superseded in its entirety as to the On Premises deductible. The operative deductible is USD 20,000.

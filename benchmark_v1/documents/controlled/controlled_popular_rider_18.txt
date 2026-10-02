@@ -1,0 +1,7 @@
+SYNTHETIC CONTROLLED RIDER — NOT AN AUTHENTIC INSURANCE DOCUMENT
+source_type: synthetic_controlled
+derived_from: popular_family_2026_2027_bond.pdf
+Rider 18
+Item 2, Bond Period, is amended to read:
+From 12:00 noon on 30 June 2026 to 12:00 noon on 30 September 2027.
+All other terms remain unchanged.

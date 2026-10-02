@@ -1,0 +1,72 @@
+[
+  {
+    "case_id": "ADV01",
+    "case_type": "adversarial",
+    "attribute": "LIMIT",
+    "question": "What is the current On Premises single loss limit?",
+    "expected_behavior": "INSUFFICIENT_EVIDENCE",
+    "expected_answer": null,
+    "contract_stack": [
+      "authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+      "adversarial/ADV01_conflicting_limit.txt"
+    ],
+    "failure_condition": "Conflicting amendments with no resolvable precedence.",
+    "required_reason": "Two candidate operative values exist and supplied evidence cannot establish which controls."
+  },
+  {
+    "case_id": "ADV02",
+    "case_type": "adversarial",
+    "attribute": "DEDUCTIBLE",
+    "question": "What is the current On Premises deductible?",
+    "expected_behavior": "INSUFFICIENT_EVIDENCE",
+    "expected_answer": null,
+    "contract_stack": [
+      "authentic/jpmorgan/jpmorgan_private_markets_2025_2026_bond.html",
+      "adversarial/ADV02_missing_deductible_value.txt"
+    ],
+    "failure_condition": "Replacement provision depends on missing Schedule A.",
+    "required_reason": "The prior value has been deleted, but the replacement amount is absent."
+  },
+  {
+    "case_id": "ADV03",
+    "case_type": "adversarial",
+    "attribute": "LIMIT",
+    "question": "What is the current On Premises single loss limit?",
+    "expected_behavior": "INSUFFICIENT_EVIDENCE",
+    "expected_answer": null,
+    "contract_stack": [
+      "authentic/eagle_point/eagle_point_2024_2025_bond.pdf",
+      "adversarial/ADV03_missing_referenced_endorsement.txt"
+    ],
+    "failure_condition": "Controlling referenced endorsement is missing.",
+    "required_reason": "The supplied document explicitly delegates the amount to an absent endorsement."
+  },
+  {
+    "case_id": "ADV04",
+    "case_type": "adversarial",
+    "attribute": "POLICY_PERIOD",
+    "question": "What is the current policy period?",
+    "expected_behavior": "INSUFFICIENT_EVIDENCE",
+    "expected_answer": null,
+    "contract_stack": [
+      "authentic/popular/popular_family_2026_2027_bond.pdf",
+      "adversarial/ADV04_conflicting_policy_period.txt"
+    ],
+    "failure_condition": "Conflicting period amendments with no resolvable precedence.",
+    "required_reason": "Two expiration dates are supported and supplied evidence cannot establish which controls."
+  },
+  {
+    "case_id": "ADV05",
+    "case_type": "adversarial",
+    "attribute": "TERRITORIAL_COVERAGE",
+    "question": "What is the current territorial coverage?",
+    "expected_behavior": "UNSUPPORTED_ATTRIBUTE",
+    "expected_answer": null,
+    "contract_stack": [
+      "authentic/popular/popular_family_2026_2027_bond.pdf",
+      "adversarial/ADV05_unsupported_attribute.txt"
+    ],
+    "failure_condition": "Question falls outside benchmark v1 ontology.",
+    "required_reason": "Supported attributes are LIMIT, DEDUCTIBLE, and POLICY_PERIOD only."
+  }
+]

@@ -1,0 +1,11 @@
+SYNTHETIC ADVERSARIAL DOCUMENT — NOT AN AUTHENTIC INSURANCE DOCUMENT
+source_type: synthetic_adversarial
+derived_from: popular_family_2026_2027_bond.pdf
+For benchmark testing only.
+
+Rider A: Item 2 Bond Period expiration is amended to 30 September 2027 at 12:00 noon.
+Rider B: Item 2 Bond Period expiration is amended to 31 December 2027 at 12:00 noon.
+
+Neither rider contains a rider number, effective date, execution timestamp, or supersession
+language. No supplied document establishes which rider controls.
+The inception remains 30 June 2026 at 12:00 noon.

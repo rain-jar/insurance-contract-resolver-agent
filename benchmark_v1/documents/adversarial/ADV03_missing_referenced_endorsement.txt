@@ -1,0 +1,11 @@
+SYNTHETIC ADVERSARIAL DOCUMENT — NOT AN AUTHENTIC INSURANCE DOCUMENT
+source_type: synthetic_adversarial
+derived_from: eagle_point_2024_2025_bond.pdf
+For benchmark testing only.
+
+Endorsement 10:
+The On Premises Single Loss Limit is amended as provided in Endorsement 9, which is
+incorporated by reference and controls the amount of the limit.
+
+Endorsement 9 is intentionally not supplied in this benchmark stack.
+No amount is stated in this document.

@@ -1,0 +1,11 @@
+SYNTHETIC ADVERSARIAL DOCUMENT — NOT AN AUTHENTIC INSURANCE DOCUMENT
+source_type: synthetic_adversarial
+derived_from: eagle_point_2024_2025_bond.pdf
+For benchmark testing only.
+
+Two amendments are supplied for the same On Premises limit:
+Amendment A: The On Premises Single Loss Limit is replaced with USD 5,000,000.
+Amendment B: The On Premises Single Loss Limit is replaced with USD 6,000,000.
+
+Neither amendment contains an endorsement number, effective date, execution timestamp, or
+language establishing priority over the other. No other supplied document establishes precedence.

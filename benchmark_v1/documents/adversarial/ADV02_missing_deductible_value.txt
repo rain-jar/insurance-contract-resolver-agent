@@ -1,0 +1,11 @@
+SYNTHETIC ADVERSARIAL DOCUMENT — NOT AN AUTHENTIC INSURANCE DOCUMENT
+source_type: synthetic_adversarial
+derived_from: jpmorgan_private_markets_2025_2026_bond.html
+For benchmark testing only.
+
+Endorsement 8:
+The On Premises deductible stated in Item 2 is deleted and replaced with the deductible
+shown in Schedule A.
+
+Schedule A is intentionally absent from this benchmark stack.
+The replacement deductible therefore cannot be determined from the supplied documents.
