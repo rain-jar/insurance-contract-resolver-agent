@@ -1,4 +1,4 @@
-from contract_stack.runner import aggregate_results
+from contract_stack.runner import _is_retryable_saved_error, aggregate_results
 
 
 def _record(
@@ -64,3 +64,13 @@ def test_aggregate_results_keeps_metrics_separate_and_counts_errors_as_failures(
     assert summary["metrics"]["semantic_evidence_accuracy"]["status"] == "NOT_SCORED"
     assert summary["failed_case_ids"]["processing"] == ["ADV01"]
     assert summary["usage"]["total_tokens"] == 26
+
+
+def test_only_external_api_failures_are_retryable_on_resume() -> None:
+    assert _is_retryable_saved_error(
+        {"error": {"type": "RateLimitError", "message": "credit exhausted"}}
+    )
+    assert not _is_retryable_saved_error(
+        {"error": {"type": "ValidationError", "message": "invalid model output"}}
+    )
+    assert not _is_retryable_saved_error({"error": None})

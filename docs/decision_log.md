@@ -1,5 +1,11 @@
 # Decision Log
 
+## 2026-10-16 - Stage 5 evidence evaluation and interrupted initial run
+
+Stage 5 uses a deterministic Evidence Accuracy rubric rather than a separate rubric-based LLM evaluator. The metric covers the 25 frozen `ANSWER` cases and requires provenance-valid citations, the expected effective source, a citation at the returned effective-source locator, and quoted support for each normalized expected-value component. Abstention evidence is evaluated separately through Abstention Accuracy. Rescoring the preserved Stage 3 baseline produces 24/25 (96%) Evidence Accuracy; A05 fails because its operative endorsement was not retrieved.
+
+The initial resolver benchmark run exhausted the API credit balance after A09. A01–A09 are valid preserved results; A10 through C07 contain external `RateLimitError` records, and later cases were not attempted. This interrupted partial summary is not a benchmark result. Resume behavior now archives retryable external-error records before replacing them, while reusing successful cases and retaining non-retryable model or validation failures as results.
+
 ## 2026-10-16 - Stage 4 resolver boundary implemented
 
 The amendment-aware resolver uses one structured `gpt-6.1-sol` extraction call over the same top-eight retrieved chunks used by the baseline. The model may identify provision events, operations, values, source metadata, required references, and explicit supersession, but it does not select the operative answer.

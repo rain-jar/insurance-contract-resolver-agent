@@ -32,4 +32,23 @@ Run one Stage 4 amendment-aware resolver case with:
 
 The resolver output exposes extracted provision events, explicit ordering relationships, the deterministic event order, the reduced operative result, and provenance errors separately.
 
-Stage 4 architecture and representative behavior are documented in `docs/stage4_resolver.md`. The full resolver benchmark is intentionally deferred to the Stage 5 comparative-evaluation gate.
+Stage 4 architecture and representative behavior are documented in `docs/stage4_resolver.md`.
+
+Run or resume the approved Stage 5 resolver evaluation with:
+
+```bash
+.venv/bin/contract-stack resolver-benchmark --output-dir artifacts/stage5_resolver/<run-id>
+```
+
+Successful cases are reused. Saved connection, timeout, server, and rate-limit failures are archived under the run's `cases/failed_attempts/` directory before retry, so external failures are not mistaken for resolver results or silently discarded.
+
+Compare a completed resolver run with the preserved Stage 3 baseline using:
+
+```bash
+.venv/bin/contract-stack compare-results \
+  --baseline-dir artifacts/stage3_baseline/20261015_gpt-6.1-sol_medium_standard_run2 \
+  --resolver-dir artifacts/stage5_resolver/<run-id> \
+  --output artifacts/stage5_comparison/<run-id>/comparison.json
+```
+
+Stage 5 uses an inspectable deterministic Evidence Accuracy rubric rather than a separate LLM judge. Answer cases require provenance-valid citations, the frozen benchmark's effective source, a citation at the returned effective-source locator, and quoted support for every normalized expected-value component. Abstention cases remain scored by Abstention Accuracy.

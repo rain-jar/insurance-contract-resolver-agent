@@ -18,11 +18,17 @@ from .baseline import (
     SERVICE_TIER,
     DirectRAGBaseline,
 )
-from .evaluation import amendment_chain_correct, abstention_correct, operative_state_correct
+from .evaluation import (
+    amendment_chain_correct,
+    abstention_correct,
+    evidence_accuracy_errors,
+    operative_state_correct,
+)
 from .ingestion import DocumentIngestor
 from .models import ResolutionStatus
 from .pipeline import ingest_stack
 from .provenance import validate_evidence_provenance
+from .resolver import EXTRACTION_INSTRUCTIONS, ContractStackResolver
 from .retrieval import HybridRetriever, OpenAIEmbedder
 
 
@@ -74,9 +80,124 @@ def run_baseline_benchmark(
         case_path = cases_dir / f"{case['case_id']}.json"
         if case_path.exists():
             record = json.loads(case_path.read_text(encoding="utf-8"))
-            print(f"[{index}/{len(cases)}] {case['case_id']}: resumed", flush=True)
+            if _is_retryable_saved_error(record):
+                _archive_failed_attempt(case_path, record)
+                record = _run_case(
+                    case,
+                    benchmark_root,
+                    ingestor,
+                    retriever,
+                    client,
+                    top_k=top_k,
+                )
+                _write_json(case_path, record)
+                outcome = "error" if record["error"] else record["result"]["status"]
+                print(
+                    f"[{index}/{len(cases)}] {case['case_id']}: retried -> {outcome}",
+                    flush=True,
+                )
+            else:
+                print(f"[{index}/{len(cases)}] {case['case_id']}: resumed", flush=True)
         else:
             record = _run_case(
+                case,
+                benchmark_root,
+                ingestor,
+                retriever,
+                client,
+                top_k=top_k,
+            )
+            _write_json(case_path, record)
+            outcome = "error" if record["error"] else record["result"]["status"]
+            print(f"[{index}/{len(cases)}] {case['case_id']}: {outcome}", flush=True)
+        records.append(record)
+        _write_json(output_dir / "summary.json", aggregate_results(records, expected_count=len(cases)))
+
+    summary = aggregate_results(records, expected_count=len(cases))
+    summary["completed_at_utc"] = datetime.now(UTC).isoformat()
+    _write_json(output_dir / "summary.json", summary)
+    return summary
+
+
+def run_resolver_benchmark(
+    cases: list[dict[str, Any]],
+    benchmark_root: Path,
+    output_dir: Path,
+    *,
+    embedding_model: str,
+    top_k: int,
+    client: OpenAI,
+) -> dict[str, Any]:
+    cases_dir = output_dir / "cases"
+    cases_dir.mkdir(parents=True, exist_ok=True)
+    ingestor = DocumentIngestor(cache_dir=Path(".cache/ingestion"))
+    embedder = OpenAIEmbedder(client, embedding_model, cache_dir=Path(".cache/embeddings"))
+    retriever = HybridRetriever(embedder)
+
+    manifest_path = output_dir / "manifest.json"
+    if not manifest_path.exists():
+        _write_json(
+            manifest_path,
+            {
+                "started_at_utc": datetime.now(UTC).isoformat(),
+                "system": "contract_stack_resolver",
+                "benchmark_root": benchmark_root.as_posix(),
+                "benchmark_sha256": _sha256_file(
+                    benchmark_root / "benchmark" / "benchmark.json"
+                ),
+                "case_count": len(cases),
+                "top_k": top_k,
+                "generation": {
+                    "model": GENERATION_MODEL,
+                    "reasoning_effort": REASONING_EFFORT,
+                    "reasoning_mode": REASONING_MODE,
+                    "service_tier": SERVICE_TIER,
+                    "max_output_tokens": MAX_OUTPUT_TOKENS,
+                    "instructions_sha256": hashlib.sha256(
+                        EXTRACTION_INSTRUCTIONS.encode("utf-8")
+                    ).hexdigest(),
+                },
+                "embedding_model": embedding_model,
+                "sdk_retry_count": 5,
+                "sdk_timeout_seconds": 180,
+                "evidence_metric": {
+                    "denominator": "ANSWER cases only",
+                    "requirements": [
+                        "all citations pass deterministic provenance validation",
+                        "effective source matches frozen benchmark ground truth",
+                        "a citation points to the returned effective-source locator",
+                        "citations quote every normalized expected-value component",
+                    ],
+                    "llm_judge": False,
+                },
+            },
+        )
+
+    records: list[dict[str, Any]] = []
+    for index, case in enumerate(cases, start=1):
+        case_path = cases_dir / f"{case['case_id']}.json"
+        if case_path.exists():
+            record = json.loads(case_path.read_text(encoding="utf-8"))
+            if _is_retryable_saved_error(record):
+                _archive_failed_attempt(case_path, record)
+                record = _run_resolver_case(
+                    case,
+                    benchmark_root,
+                    ingestor,
+                    retriever,
+                    client,
+                    top_k=top_k,
+                )
+                _write_json(case_path, record)
+                outcome = "error" if record["error"] else record["result"]["status"]
+                print(
+                    f"[{index}/{len(cases)}] {case['case_id']}: retried -> {outcome}",
+                    flush=True,
+                )
+            else:
+                print(f"[{index}/{len(cases)}] {case['case_id']}: resumed", flush=True)
+        else:
+            record = _run_resolver_case(
                 case,
                 benchmark_root,
                 ingestor,
@@ -122,6 +243,7 @@ def _run_case(
         retrieved = retriever.retrieve(case["question"], chunks, top_k=top_k)
         run = DirectRAGBaseline(client).answer(case["question"], retrieved)
         provenance_errors = validate_evidence_provenance(run.result.evidence, retrieved)
+        evidence_errors = evidence_accuracy_errors(case, run.result, provenance_errors)
         is_answer = run.result.status == ResolutionStatus.ANSWER
         base_record.update(
             {
@@ -138,8 +260,12 @@ def _run_case(
                         else None
                     ),
                     "citation_provenance_valid": not provenance_errors if is_answer else None,
+                    "evidence_accurate": (
+                        not evidence_errors if evidence_errors is not None else None
+                    ),
                     "semantic_evidence_accuracy": "NOT_SCORED",
                 },
+                "evidence_accuracy_errors": evidence_errors,
                 "error": None,
             }
         )
@@ -157,6 +283,122 @@ def _run_case(
                         False if case["expected_behavior"] != ResolutionStatus.ANSWER.value else None
                     ),
                     "citation_provenance_valid": None,
+                    "evidence_accurate": (
+                        False
+                        if case["expected_behavior"] == ResolutionStatus.ANSWER.value
+                        else None
+                    ),
+                    "semantic_evidence_accuracy": "NOT_SCORED",
+                },
+                "evidence_accuracy_errors": (
+                    ["The case failed before evidence could be evaluated."]
+                    if case["expected_behavior"] == ResolutionStatus.ANSWER.value
+                    else None
+                ),
+                "error": {"type": type(exc).__name__, "message": str(exc)},
+            }
+        )
+    base_record["elapsed_seconds"] = round(time.monotonic() - started, 3)
+    return base_record
+
+
+def _run_resolver_case(
+    case: dict[str, Any],
+    benchmark_root: Path,
+    ingestor: DocumentIngestor,
+    retriever: HybridRetriever,
+    client: OpenAI,
+    *,
+    top_k: int,
+) -> dict[str, Any]:
+    started = time.monotonic()
+    base_record: dict[str, Any] = {
+        "case_id": case["case_id"],
+        "case_type": case["case_type"],
+        "question": case["question"],
+        "contract_stack": case["contract_stack"],
+        "expected": {
+            "expected_behavior": case["expected_behavior"],
+            "expected_answer": case.get("expected_answer"),
+            "effective_source": case.get("effective_source"),
+            "required_evidence": case["required_evidence"],
+            "amendment_chain": case["amendment_chain"],
+        },
+    }
+    try:
+        chunks = ingest_stack(benchmark_root, case["contract_stack"], ingestor)
+        retrieved = retriever.retrieve(case["question"], chunks, top_k=top_k)
+        run = ContractStackResolver(client).resolve(case["question"], retrieved)
+        result_provenance_errors = validate_evidence_provenance(run.result.evidence, retrieved)
+        evidence_errors = evidence_accuracy_errors(case, run.result, result_provenance_errors)
+        is_answer = run.result.status == ResolutionStatus.ANSWER
+        base_record.update(
+            {
+                "result": run.result.model_dump(mode="json"),
+                "extracted_events": [
+                    event.model_dump(mode="json") for event in run.extracted_events
+                ],
+                "ordered_events": [
+                    event.model_dump(mode="json") for event in run.ordered_events
+                ],
+                "relationships": [
+                    relationship.model_dump(mode="json")
+                    for relationship in run.relationships
+                ],
+                "api_metadata": run.api_metadata,
+                "retrieved": [item.model_dump(mode="json") for item in retrieved],
+                "extraction_provenance_errors": run.extraction_provenance_errors,
+                "result_provenance_errors": result_provenance_errors,
+                "evidence_accuracy_errors": evidence_errors,
+                "metrics": {
+                    "operative_state_correct": operative_state_correct(case, run.result),
+                    "amendment_chain_correct": amendment_chain_correct(case, run.result),
+                    "abstention_correct": (
+                        abstention_correct(case, run.result)
+                        if case["expected_behavior"] != ResolutionStatus.ANSWER.value
+                        else None
+                    ),
+                    "citation_provenance_valid": (
+                        not result_provenance_errors if is_answer else None
+                    ),
+                    "evidence_accurate": (
+                        not evidence_errors if evidence_errors is not None else None
+                    ),
+                    "semantic_evidence_accuracy": "NOT_SCORED",
+                },
+                "error": None,
+            }
+        )
+    except Exception as exc:  # Preserve case-level failures instead of aborting the run.
+        base_record.update(
+            {
+                "result": None,
+                "extracted_events": [],
+                "ordered_events": [],
+                "relationships": [],
+                "api_metadata": None,
+                "retrieved": [],
+                "extraction_provenance_errors": [],
+                "result_provenance_errors": [],
+                "evidence_accuracy_errors": (
+                    ["The case failed before evidence could be evaluated."]
+                    if case["expected_behavior"] == ResolutionStatus.ANSWER.value
+                    else None
+                ),
+                "metrics": {
+                    "operative_state_correct": False,
+                    "amendment_chain_correct": False,
+                    "abstention_correct": (
+                        False
+                        if case["expected_behavior"] != ResolutionStatus.ANSWER.value
+                        else None
+                    ),
+                    "citation_provenance_valid": None,
+                    "evidence_accurate": (
+                        False
+                        if case["expected_behavior"] == ResolutionStatus.ANSWER.value
+                        else None
+                    ),
                     "semantic_evidence_accuracy": "NOT_SCORED",
                 },
                 "error": {"type": type(exc).__name__, "message": str(exc)},
@@ -173,6 +415,9 @@ def aggregate_results(records: list[dict[str, Any]], *, expected_count: int) -> 
     answer_records = [
         record for record in records if record["metrics"]["citation_provenance_valid"] is not None
     ]
+    evidence_records = [
+        record for record in records if record["metrics"].get("evidence_accurate") is not None
+    ]
     return {
         "expected_case_count": expected_count,
         "completed_case_count": len(records),
@@ -182,9 +427,10 @@ def aggregate_results(records: list[dict[str, Any]], *, expected_count: int) -> 
             "amendment_chain_accuracy": _metric(records, "amendment_chain_correct"),
             "abstention_accuracy": _metric(abstention_records, "abstention_correct"),
             "citation_provenance_validity": _metric(answer_records, "citation_provenance_valid"),
+            "evidence_accuracy": _metric(evidence_records, "evidence_accurate"),
             "semantic_evidence_accuracy": {
                 "status": "NOT_SCORED",
-                "reason": "A semantic evidence-accuracy method has not been approved.",
+                "reason": "Stage 5 uses the approved deterministic evidence rubric, not an LLM judge.",
             },
         },
         "failed_case_ids": {
@@ -208,6 +454,11 @@ def aggregate_results(records: list[dict[str, Any]], *, expected_count: int) -> 
                 record["case_id"]
                 for record in answer_records
                 if not record["metrics"]["citation_provenance_valid"]
+            ],
+            "evidence": [
+                record["case_id"]
+                for record in evidence_records
+                if not record["metrics"]["evidence_accurate"]
             ],
         },
         "usage": _aggregate_usage(records),
@@ -256,3 +507,22 @@ def _write_json(path: Path, data: dict[str, Any]) -> None:
 
 def _sha256_file(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _is_retryable_saved_error(record: dict[str, Any]) -> bool:
+    error = record.get("error")
+    return error is not None and error.get("type") in {
+        "APIConnectionError",
+        "APITimeoutError",
+        "InternalServerError",
+        "RateLimitError",
+    }
+
+
+def _archive_failed_attempt(case_path: Path, record: dict[str, Any]) -> None:
+    attempts_dir = case_path.parent / "failed_attempts"
+    attempts_dir.mkdir(parents=True, exist_ok=True)
+    index = 1
+    while (attempts_dir / f"{case_path.stem}_attempt_{index}.json").exists():
+        index += 1
+    _write_json(attempts_dir / f"{case_path.stem}_attempt_{index}.json", record)
