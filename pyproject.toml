@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "contract-stack-resolver"
+version = "0.1.0"
+description = "Benchmark baseline and amendment-aware insurance contract stack resolver"
+requires-python = ">=3.12"
+dependencies = [
+  "beautifulsoup4>=4.12,<5",
+  "numpy>=2,<3",
+  "openai>=2,<3",
+  "pdfplumber>=0.11,<1",
+  "pydantic>=2.10,<3",
+  "rank-bm25>=0.2.2,<1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10"]
+
+[project.scripts]
+contract-stack = "contract_stack.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
