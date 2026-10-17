@@ -9,7 +9,7 @@ from typing import Any
 from .storage import StoredDocument
 
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 MIGRATION_1 = """
 CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -49,6 +49,11 @@ CREATE TABLE analyses (
 CREATE INDEX analyses_stack_id_index ON analyses(stack_id);
 """
 
+MIGRATION_2 = """
+ALTER TABLE stacks ADD COLUMN owner_id TEXT NOT NULL DEFAULT 'local';
+CREATE INDEX stacks_owner_id_index ON stacks(owner_id);
+"""
+
 
 class SQLiteRepository:
     def __init__(self, database_path: Path) -> None:
@@ -73,6 +78,12 @@ class SQLiteRepository:
                     "INSERT INTO schema_migrations(version, applied_at_utc) VALUES (?, ?)",
                     (1, _now()),
                 )
+            if 2 not in applied:
+                connection.executescript(MIGRATION_2)
+                connection.execute(
+                    "INSERT INTO schema_migrations(version, applied_at_utc) VALUES (?, ?)",
+                    (2, _now()),
+                )
             version = connection.execute(
                 "SELECT MAX(version) AS version FROM schema_migrations"
             ).fetchone()["version"]
@@ -84,12 +95,14 @@ class SQLiteRepository:
         stack_id: str,
         title: str,
         documents: list[StoredDocument],
+        owner_id: str = "local",
     ) -> dict[str, Any]:
         created_at = _now()
         with self._connect() as connection:
             connection.execute(
-                "INSERT INTO stacks(id, title, created_at_utc) VALUES (?, ?, ?)",
-                (stack_id, title, created_at),
+                "INSERT INTO stacks(id, title, created_at_utc, owner_id) "
+                "VALUES (?, ?, ?, ?)",
+                (stack_id, title, created_at, owner_id),
             )
             connection.executemany(
                 "INSERT INTO documents"
@@ -106,17 +119,21 @@ class SQLiteRepository:
                     for item in documents
                 ],
             )
-        result = self.get_stack(stack_id)
+        result = self.get_stack(stack_id, owner_id=owner_id)
         if result is None:
             raise RuntimeError("The stored contract stack could not be reloaded.")
         return result
 
-    def get_stack(self, stack_id: str) -> dict[str, Any] | None:
+    def get_stack(
+        self, stack_id: str, owner_id: str | None = None
+    ) -> dict[str, Any] | None:
         with self._connect() as connection:
-            stack = connection.execute(
-                "SELECT id, title, created_at_utc FROM stacks WHERE id = ?",
-                (stack_id,),
-            ).fetchone()
+            sql = "SELECT id, title, created_at_utc, owner_id FROM stacks WHERE id = ?"
+            parameters: tuple[Any, ...] = (stack_id,)
+            if owner_id is not None:
+                sql += " AND owner_id = ?"
+                parameters += (owner_id,)
+            stack = connection.execute(sql, parameters).fetchone()
             if stack is None:
                 return None
             documents = connection.execute(
@@ -126,14 +143,18 @@ class SQLiteRepository:
             ).fetchall()
         return {**dict(stack), "documents": [dict(item) for item in documents]}
 
-    def list_stacks(self) -> list[dict[str, Any]]:
+    def list_stacks(self, owner_id: str | None = None) -> list[dict[str, Any]]:
         with self._connect() as connection:
-            rows = connection.execute(
+            where = "WHERE stacks.owner_id = ? " if owner_id is not None else ""
+            parameters: tuple[Any, ...] = (owner_id,) if owner_id is not None else ()
+            query = (
                 "SELECT stacks.id, stacks.title, stacks.created_at_utc, "
                 "COUNT(documents.id) AS document_count "
                 "FROM stacks LEFT JOIN documents ON documents.stack_id = stacks.id "
-                "GROUP BY stacks.id ORDER BY stacks.created_at_utc DESC"
-            ).fetchall()
+                + where
+                + "GROUP BY stacks.id ORDER BY stacks.created_at_utc DESC"
+            )
+            rows = connection.execute(query, parameters).fetchall()
         return [dict(row) for row in rows]
 
     def list_expired_stack_ids(self, cutoff_utc: str) -> list[str]:
@@ -210,14 +231,23 @@ class SQLiteRepository:
             (type(error).__name__, public_message or str(error), _now()),
         )
 
-    def get_analysis(self, analysis_id: str) -> dict[str, Any] | None:
+    def get_analysis(
+        self, analysis_id: str, owner_id: str | None = None
+    ) -> dict[str, Any] | None:
         with self._connect() as connection:
-            row = connection.execute(
-                "SELECT id, stack_id, question, status, result_json, error_type, "
-                "error_message, created_at_utc, started_at_utc, completed_at_utc "
-                "FROM analyses WHERE id = ?",
-                (analysis_id,),
-            ).fetchone()
+            sql = (
+                "SELECT analyses.id, analyses.stack_id, analyses.question, "
+                "analyses.status, analyses.result_json, analyses.error_type, "
+                "analyses.error_message, analyses.created_at_utc, "
+                "analyses.started_at_utc, analyses.completed_at_utc "
+                "FROM analyses JOIN stacks ON stacks.id = analyses.stack_id "
+                "WHERE analyses.id = ?"
+            )
+            parameters: tuple[Any, ...] = (analysis_id,)
+            if owner_id is not None:
+                sql += " AND stacks.owner_id = ?"
+                parameters += (owner_id,)
+            row = connection.execute(sql, parameters).fetchone()
         if row is None:
             return None
         result = dict(row)
@@ -234,6 +264,28 @@ class SQLiteRepository:
                 (stack_id,),
             ).fetchall()
         return [dict(row) for row in rows]
+
+    def count_stacks(self, owner_id: str) -> int:
+        with self._connect() as connection:
+            return connection.execute(
+                "SELECT COUNT(*) AS count FROM stacks WHERE owner_id = ?",
+                (owner_id,),
+            ).fetchone()["count"]
+
+    def count_analyses_since(
+        self, since_utc: str, owner_id: str | None = None
+    ) -> int:
+        with self._connect() as connection:
+            sql = (
+                "SELECT COUNT(*) AS count FROM analyses "
+                "JOIN stacks ON stacks.id = analyses.stack_id "
+                "WHERE analyses.created_at_utc >= ?"
+            )
+            parameters: tuple[Any, ...] = (since_utc,)
+            if owner_id is not None:
+                sql += " AND stacks.owner_id = ?"
+                parameters += (owner_id,)
+            return connection.execute(sql, parameters).fetchone()["count"]
 
     def _update_analysis(
         self, analysis_id: str, assignments: str, parameters: tuple[Any, ...]

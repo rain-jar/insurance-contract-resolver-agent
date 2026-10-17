@@ -19,7 +19,17 @@
             <small>Resolver</small>
           </span>
         </a>
-        <div class="environment-badge"><span></span> Local workspace</div>
+        {% if authentication_enabled and reviewer_id %}
+          <div class="header-account">
+            <div class="environment-badge"><span></span> {{ reviewer_id }}</div>
+            <form method="post" action="/logout">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+              <button class="text-button" type="submit">Sign out</button>
+            </form>
+          </div>
+        {% elif not authentication_page %}
+          <div class="environment-badge"><span></span> Local workspace</div>
+        {% endif %}
       </div>
     </header>
     <main id="main-content" class="shell page-shell">
@@ -28,7 +38,7 @@
     <footer class="site-footer">
       <div class="shell footer-inner">
         <span>Decision support with inspectable provenance</span>
-        <span>Files remain on this device</span>
+        <span>{% if authentication_enabled %}Hosted files are retained temporarily{% else %}Files remain on this device{% endif %}</span>
       </div>
     </footer>
   </body>

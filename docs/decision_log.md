@@ -1,5 +1,9 @@
 # Decision Log
 
+## 2026-10-17 - Stage 7 invite-only cloud reviewer
+
+The portfolio deployment preserves the complete upload, analysis, and auditable-result experience behind unique invitation codes rather than publishing an anonymous upload surface. Each reviewer identifier owns an isolated workspace; signed eight-hour sessions, CSRF/origin checks, trusted hosts, conservative quotas, temporary retention, and browser security headers establish the network boundary. The first deployment remains one Render instance with SQLite, uploads, and derived caches on one persistent disk. This is a bounded pilot architecture, not horizontally scalable multi-tenant SaaS; durable external jobs and a managed database remain later-stage options if real usage justifies them. The frozen benchmark and resolver behavior are unchanged.
+
 ## 2026-10-16 - Stage 6D split into local release hardening and later unseen evaluation
 
 The local pilot will be released before constructing a separately versioned unseen evaluation set. Stage 5 remains the current benchmark evidence, but because it informed reducer fixes and relationship-driven retrieval, the release will not claim that Stage 5 is an untouched generalization test. A small independently grounded unseen evaluation and formal release thresholds are deferred until after workflow feedback from the pilot.

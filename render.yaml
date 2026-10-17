@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: contract-stack-resolver
+    runtime: docker
+    region: ohio
+    plan: 0.5c-512mb
+    numInstances: 1
+    healthCheckPath: /health
+    maxShutdownDelaySeconds: 300
+    envVars:
+      - key: PORT
+        value: "8000"
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CONTRACT_STACK_INVITE_CODES
+        sync: false
+      - key: CONTRACT_STACK_SESSION_SECRET
+        generateValue: true
+      - key: CONTRACT_STACK_ALLOWED_HOSTS
+        value: "*.onrender.com"
+      - key: CONTRACT_STACK_SECURE_COOKIES
+        value: "true"
+      - key: CONTRACT_STACK_RETENTION_DAYS
+        value: "7"
+      - key: CONTRACT_STACK_MAX_STACKS_PER_REVIEWER
+        value: "5"
+      - key: CONTRACT_STACK_MAX_DAILY_ANALYSES_PER_REVIEWER
+        value: "10"
+      - key: CONTRACT_STACK_MAX_DAILY_ANALYSES_GLOBAL
+        value: "30"
+      - key: LOG_LEVEL
+        value: "INFO"
+    disk:
+      name: reviewer-data
+      mountPath: /data
+      sizeGB: 1

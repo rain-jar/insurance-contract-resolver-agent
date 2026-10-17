@@ -220,6 +220,97 @@ def test_failed_analysis_can_be_retried_from_reviewer_page(tmp_path: Path) -> No
         assert status == "COMPLETED"
 
 
+def test_invite_authentication_protects_and_isolates_reviewer_workspaces(
+    tmp_path: Path,
+) -> None:
+    settings = APISettings(
+        data_directory=tmp_path / "data",
+        database_path=tmp_path / "data" / "app.sqlite3",
+        invite_codes=(
+            ("reviewer-one", "reviewer-one-secret-code"),
+            ("reviewer-two", "reviewer-two-secret-code"),
+        ),
+        session_secret="test-session-secret-that-is-long-enough",
+    )
+    app = create_app(settings, generator=_FakeGenerator())
+
+    with TestClient(app) as first, TestClient(app) as second:
+        protected = first.get("/", follow_redirects=False)
+        assert protected.status_code == 303
+        assert protected.headers["location"] == "/login"
+        assert first.get("/api/stacks").status_code == 401
+
+        rejected = first.post(
+            "/login",
+            data={"access_code": "not-a-valid-code"},
+        )
+        assert rejected.status_code == 401
+        assert "invalid or has expired" in rejected.text
+
+        assert _login(first, "reviewer-one-secret-code").status_code == 303
+        dashboard = first.get("/")
+        assert dashboard.status_code == 200
+        assert "reviewer-one" in dashboard.text
+        assert dashboard.headers["Content-Security-Policy"]
+        csrf = first.cookies[CSRF_COOKIE]
+        created = first.post(
+            "/stacks",
+            data={"title": "Private policy", "csrf_token": csrf},
+            files={"files": ("contract.txt", "Policy text", "text/plain")},
+            follow_redirects=False,
+        )
+        stack_path = created.headers["location"]
+
+        assert _login(second, "reviewer-two-secret-code").status_code == 303
+        assert second.get(stack_path).status_code == 404
+        assert second.get("/api/stacks").json() == []
+
+        signed_out = first.post(
+            "/logout",
+            data={"csrf_token": csrf},
+            follow_redirects=False,
+        )
+        assert signed_out.status_code == 303
+        assert first.get(stack_path, follow_redirects=False).status_code == 303
+
+
+def test_authenticated_reviewer_stack_quota_is_enforced(tmp_path: Path) -> None:
+    settings = APISettings(
+        data_directory=tmp_path / "data",
+        database_path=tmp_path / "data" / "app.sqlite3",
+        invite_codes=(("reviewer", "reviewer-secret-code-long"),),
+        session_secret="test-session-secret-that-is-long-enough",
+        max_stacks_per_reviewer=1,
+    )
+    app = create_app(settings, generator=_FakeGenerator())
+    with TestClient(app) as client:
+        _login(client, "reviewer-secret-code-long")
+        csrf = client.get("/").cookies.get(CSRF_COOKIE) or client.cookies[CSRF_COOKIE]
+        first = client.post(
+            "/stacks",
+            data={"csrf_token": csrf},
+            files={"files": ("first.txt", "Policy text", "text/plain")},
+            follow_redirects=False,
+        )
+        second = client.post(
+            "/stacks",
+            data={"csrf_token": csrf},
+            files={"files": ("second.txt", "Policy text", "text/plain")},
+            follow_redirects=False,
+        )
+
+    assert first.status_code == 303
+    assert second.status_code == 429
+
+
+def _login(client: TestClient, access_code: str):
+    return client.post(
+        "/login",
+        data={"access_code": access_code},
+        follow_redirects=False,
+    )
+
+
 def _events() -> list[ProvisionEvent]:
     return [
         _event(

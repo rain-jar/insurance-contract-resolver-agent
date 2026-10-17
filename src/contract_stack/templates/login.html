@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="login-layout" aria-labelledby="login-title">
+  <div class="login-intro">
+    <p class="eyebrow">Private reviewer workspace</p>
+    <h1 id="login-title">Trace the contract term that governs now.</h1>
+    <p class="lede">Upload a policy with its endorsements, ask a focused coverage question, and inspect the resulting amendment chain and supporting evidence.</p>
+    <ul class="login-assurances">
+      <li>Each reviewer receives an isolated workspace.</li>
+      <li>Uploads expire automatically from the hosted demo.</li>
+      <li>Results support review; they are not legal advice.</li>
+    </ul>
+  </div>
+  <div class="panel login-panel">
+    <p class="eyebrow">Invitation required</p>
+    <h2>Reviewer access</h2>
+    <p>Enter the private code provided with your invitation.</p>
+    {% if login_error %}
+      <div class="form-error" role="alert">{{ login_error }}</div>
+    {% endif %}
+    <form method="post" action="/login" class="upload-form">
+      <label for="access-code">Access code</label>
+      <input id="access-code" name="access_code" type="password" required autocomplete="current-password" autofocus>
+      <button class="button primary full-width" type="submit">Enter workspace</button>
+    </form>
+    <small class="login-help">No public registration. Contact the project owner if your code has expired.</small>
+  </div>
+</section>
+{% endblock %}

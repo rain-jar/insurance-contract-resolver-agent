@@ -46,7 +46,7 @@ def test_stack_analysis_and_delete_api_workflow(tmp_path: Path) -> None:
     client = TestClient(create_app(settings, generator=generator))
 
     health = client.get("/health")
-    assert health.json() == {"status": "ok", "database": "ok", "schema_version": 1}
+    assert health.json() == {"status": "ok", "database": "ok", "schema_version": 2}
     assert health.headers["X-Request-ID"]
 
     created = client.post(
