@@ -6,7 +6,6 @@ services:
     plan: free
     numInstances: 1
     healthCheckPath: /health
-    maxShutdownDelaySeconds: 300
     envVars:
       - key: PORT
         value: "8000"
