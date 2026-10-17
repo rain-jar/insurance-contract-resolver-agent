@@ -3,7 +3,7 @@ services:
     name: contract-stack-resolver
     runtime: docker
     region: ohio
-    plan: 0.5c-512mb
+    plan: free
     numInstances: 1
     healthCheckPath: /health
     maxShutdownDelaySeconds: 300
@@ -30,7 +30,3 @@ services:
         value: "30"
       - key: LOG_LEVEL
         value: "INFO"
-    disk:
-      name: reviewer-data
-      mountPath: /data
-      sizeGB: 1

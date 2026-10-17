@@ -12,10 +12,10 @@ one another's records. There is no public registration flow.
 
 ## Render deployment
 
-`render.yaml` defines one Docker web service in the Ohio region with one 1 GB
-persistent disk mounted at `/data`. The service must remain at one instance:
-SQLite, uploaded files, and derived caches live together on that disk, and the
-in-process analysis worker is intentionally single-instance.
+`render.yaml` defines one free Docker web service in the Ohio region. SQLite,
+uploaded files, and derived caches use the service's ephemeral filesystem. The
+service remains at one instance because the in-process analysis worker and
+filesystem workspace are intentionally single-instance.
 
 Render prompts for these secrets during initial Blueprint creation:
 
@@ -28,24 +28,24 @@ Render generates `CONTRACT_STACK_SESSION_SECRET`. Never commit any of these
 values. Hosted sessions last eight hours, use signed HTTPS-only cookies, and are
 invalidated when their reviewer ID is removed from the invite configuration.
 
-The Blueprint also enables seven-day application retention and conservative
-per-reviewer/global quotas. Retention cleanup runs when the application starts.
-Manual stack deletion removes the database record, original uploads, and derived
-caches immediately from the live disk.
+The Blueprint also enables a seven-day upper-bound application retention policy
+and conservative per-reviewer/global quotas. In practice, Render may erase the
+entire workspace sooner whenever the free service spins down, restarts, or is
+redeployed. Manual stack deletion removes the database record, original uploads,
+and derived caches immediately from the current instance.
 
 ## Operational limits
 
 - This is a bounded portfolio/pilot service, not a production multi-tenant SaaS.
-- An in-progress analysis is marked failed if the service restarts; the reviewer
-  can retry it explicitly.
-- A persistent disk prevents horizontal scaling and causes brief deploy downtime.
-- Application deletion does not immediately erase provider disk snapshots.
-  Render creates encrypted daily snapshots and retains them under its snapshot
-  policy, so reviewers must be told not to upload material that cannot enter
-  that backup lifecycle.
-- The initial 512 MB compute size is deliberately economical. If representative
-  PDF/OCR work exhausts memory, upgrade vertically to the 2 GB plan before
-  inviting additional reviewers.
+- Free services spin down after inactivity. Waking the service can take about a
+  minute, and all prior stacks and results can disappear at spin-down, restart,
+  or deployment. Reviewers must download or record anything they need before
+  leaving the session.
+- An in-progress analysis can be lost if the service stops. There is no durable
+  retry queue because the free filesystem is intentionally disposable.
+- The free 512 MB compute size may be insufficient for large PDF/OCR work. Keep
+  uploads small; a paid vertical upgrade is required if representative files
+  exhaust memory.
 - Quotas limit accidental model spend but are not a billing cap. Configure OpenAI
   project budgets and alerts independently.
 

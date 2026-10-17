@@ -83,7 +83,7 @@ With `OPENAI_API_KEY` set, start the local application using:
 
 The local application binds to `127.0.0.1:8000` and stores data under the ignored `.local/contract-stack` directory. Open `http://127.0.0.1:8000/` for the reviewer interface or `http://127.0.0.1:8000/docs` for interactive API documentation. This default local mode is intentionally unauthenticated and must not be exposed to a network. See `docs/stage6_api.md` and `docs/stage6_ui.md` for the local boundary.
 
-Stage 7 adds a separate invite-only deployment boundary without changing the local workflow or frozen benchmark. It provides signed sessions, isolated reviewer workspaces, quotas, temporary retention, hardened browser responses, and a single-instance Render Blueprint. See `docs/stage7_cloud_reviewer.md`.
+Stage 7 adds a separate invite-only deployment boundary without changing the local workflow or frozen benchmark. It provides signed sessions, isolated reviewer workspaces, quotas, hardened browser responses, and a free single-instance Render Blueprint with intentionally disposable storage. See `docs/stage7_cloud_reviewer.md`.
 
 For the containerized local release, place `OPENAI_API_KEY` in the ignored `.env` file and run:
 
