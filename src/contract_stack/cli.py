@@ -16,7 +16,12 @@ from .pipeline import ingest_stack
 from .provenance import validate_evidence_provenance
 from .retrieval import HybridRetriever, OpenAIEmbedder
 from .resolver import ContractStackResolver
-from .runner import run_baseline_benchmark, run_resolver_benchmark
+from .runner import (
+    replay_resolver_benchmark,
+    run_baseline_benchmark,
+    run_relationship_benchmark,
+    run_resolver_benchmark,
+)
 
 
 def main() -> None:
@@ -53,6 +58,22 @@ def main() -> None:
     comparison_parser.add_argument("--resolver-dir", type=Path, required=True)
     comparison_parser.add_argument("--output", type=Path, required=True)
     comparison_parser.add_argument("--benchmark-root", type=Path, default=Path("benchmark_v1"))
+    replay_parser = subparsers.add_parser(
+        "replay-resolver", help="Replay saved extractions through deterministic resolver logic"
+    )
+    replay_parser.add_argument("--source-dir", type=Path, required=True)
+    replay_parser.add_argument("--output-dir", type=Path, required=True)
+    replay_parser.add_argument("--benchmark-root", type=Path, default=Path("benchmark_v1"))
+    relationship_parser = subparsers.add_parser(
+        "relationship-benchmark",
+        help="Run the bounded relationship-driven third-system benchmark",
+    )
+    relationship_parser.add_argument("--source-dir", type=Path, required=True)
+    relationship_parser.add_argument("--output-dir", type=Path, required=True)
+    relationship_parser.add_argument(
+        "--benchmark-root", type=Path, default=Path("benchmark_v1")
+    )
+    relationship_parser.add_argument("--max-added-chunks", type=int, default=2)
     args = parser.parse_args()
     if args.command == "baseline-case":
         _run_case(args.case_id, args.benchmark_root, args.top_k)
@@ -68,6 +89,15 @@ def main() -> None:
             args.baseline_dir,
             args.resolver_dir,
             args.output,
+        )
+    elif args.command == "replay-resolver":
+        _replay_resolver(args.benchmark_root, args.source_dir, args.output_dir)
+    elif args.command == "relationship-benchmark":
+        _run_relationship_benchmark(
+            args.benchmark_root,
+            args.source_dir,
+            args.output_dir,
+            args.max_added_chunks,
         )
 
 
@@ -166,6 +196,31 @@ def _compare_results(
     comparison = compare_saved_runs(cases, baseline_dir, resolver_dir)
     write_comparison(output, comparison)
     print(json.dumps({"output": output.as_posix(), "comparison": comparison}, indent=2))
+
+
+def _replay_resolver(benchmark_root: Path, source_dir: Path, output_dir: Path) -> None:
+    cases = load_benchmark(benchmark_root / "benchmark" / "benchmark.json")
+    summary = replay_resolver_benchmark(cases, source_dir, output_dir)
+    print(json.dumps({"output_dir": output_dir.as_posix(), "summary": summary}, indent=2))
+
+
+def _run_relationship_benchmark(
+    benchmark_root: Path,
+    source_dir: Path,
+    output_dir: Path,
+    max_added_chunks: int,
+) -> None:
+    cases = load_benchmark(benchmark_root / "benchmark" / "benchmark.json")
+    client = OpenAI(max_retries=5, timeout=180.0)
+    summary = run_relationship_benchmark(
+        cases,
+        benchmark_root,
+        source_dir,
+        output_dir,
+        client=client,
+        max_added_chunks=max_added_chunks,
+    )
+    print(json.dumps({"output_dir": output_dir.as_posix(), "summary": summary}, indent=2))
 
 
 if __name__ == "__main__":

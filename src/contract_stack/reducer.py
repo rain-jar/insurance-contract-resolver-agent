@@ -57,7 +57,7 @@ def reduce_provisions(query: QuerySpec, events: list[ProvisionEvent]) -> Reducti
     current: NormalizedValue | None = None
     active = False
     chain: list[ChainStep] = []
-    for event in ordered:
+    for event_index, event in enumerate(ordered):
         if not event.evidence:
             return _insufficient(
                 query,
@@ -96,6 +96,20 @@ def reduce_provisions(query: QuerySpec, events: list[ProvisionEvent]) -> Reducti
                 ordered_events=ordered,
                 relationships=relationships,
             )
+        # A complete first amendment establishes a new operative state.  The
+        # base remains part of reduction, provenance, and ordering, but is not
+        # part of the operative amendment chain that begins at that restatement.
+        if (
+            event.operation == Operation.AMEND
+            and event.value is not None
+            and _is_complete(query.attribute, event.value)
+            and all(
+                prior.operation == Operation.BASE
+                for prior in ordered[:event_index]
+            )
+        ):
+            chain.clear()
+
         chain.append(
             ChainStep(
                 source=_label(event),
@@ -228,7 +242,41 @@ def _deduplicate(events: list[ProvisionEvent]) -> tuple[list[ProvisionEvent], st
             return [], f"Conflicting extractions were produced for {_label(event)}."
         merged_evidence = _dedupe_evidence([*prior.evidence, *event.evidence])
         unique[key] = prior.model_copy(update={"evidence": merged_evidence})
-    return list(unique.values()), None
+    return _coalesce_equivalent_bases(list(unique.values())), None
+
+
+def _coalesce_equivalent_bases(events: list[ProvisionEvent]) -> list[ProvisionEvent]:
+    referenced_labels = {
+        _canonical(source)
+        for event in events
+        for source in [*event.ordering.required_sources, *event.ordering.supersedes]
+    }
+    coalesced: list[ProvisionEvent] = []
+    indexes: dict[tuple, int] = {}
+    for event in events:
+        if event.operation != Operation.BASE:
+            coalesced.append(event)
+            continue
+        key = (
+            event.attribute,
+            _canonical(event.subject or ""),
+            event.operation,
+            tuple(event.value.model_dump().items()) if event.value is not None else None,
+            event.source.document_path.replace("\\", "/").casefold(),
+        )
+        prior_index = indexes.get(key)
+        if prior_index is None:
+            indexes[key] = len(coalesced)
+            coalesced.append(event)
+            continue
+
+        prior = coalesced[prior_index]
+        prior_is_referenced = _canonical(_label(prior)) in referenced_labels
+        event_is_referenced = _canonical(_label(event)) in referenced_labels
+        preferred = event if event_is_referenced and not prior_is_referenced else prior
+        merged_evidence = _dedupe_evidence([*prior.evidence, *event.evidence])
+        coalesced[prior_index] = preferred.model_copy(update={"evidence": merged_evidence})
+    return coalesced
 
 
 def _has_overlapping_changes(events: list[ProvisionEvent]) -> bool:

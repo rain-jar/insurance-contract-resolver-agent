@@ -1,4 +1,8 @@
-from contract_stack.runner import _is_retryable_saved_error, aggregate_results
+from contract_stack.runner import (
+    _combine_api_metadata,
+    _is_retryable_saved_error,
+    aggregate_results,
+)
 
 
 def _record(
@@ -74,3 +78,35 @@ def test_only_external_api_failures_are_retryable_on_resume() -> None:
         {"error": {"type": "ValidationError", "message": "invalid model output"}}
     )
     assert not _is_retryable_saved_error({"error": None})
+
+
+def test_combined_api_metadata_sums_paired_call_usage() -> None:
+    initial = {
+        "usage": {
+            "input_tokens": 10,
+            "input_tokens_details": {"cached_tokens": 2, "cache_write_tokens": 8},
+            "output_tokens": 4,
+            "output_tokens_details": {"reasoning_tokens": 1},
+            "total_tokens": 14,
+        }
+    }
+    expansion = {
+        "usage": {
+            "input_tokens": 5,
+            "input_tokens_details": {"cached_tokens": 1, "cache_write_tokens": 4},
+            "output_tokens": 3,
+            "output_tokens_details": {"reasoning_tokens": 2},
+            "total_tokens": 8,
+        }
+    }
+
+    combined = _combine_api_metadata(initial, expansion)
+
+    assert combined is not None
+    assert combined["usage"] == {
+        "input_tokens": 15,
+        "output_tokens": 7,
+        "total_tokens": 22,
+        "input_tokens_details": {"cached_tokens": 3, "cache_write_tokens": 12},
+        "output_tokens_details": {"reasoning_tokens": 3},
+    }

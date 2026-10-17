@@ -22,7 +22,7 @@ Run or resume the full frozen baseline benchmark with:
 .venv/bin/contract-stack baseline-benchmark --output-dir artifacts/stage3_baseline/<run-id>
 ```
 
-Each case is saved independently before the next case begins. Reusing the same output directory resumes completed cases. The summary reports operative-state, amendment-chain, abstention, and deterministic citation-provenance results separately. Semantic Evidence Accuracy remains explicitly unscored until its evaluation method is approved.
+Each case is saved independently before the next case begins. Reusing the same output directory resumes completed cases. The summary reports operative-state, amendment-chain, abstention, and deterministic citation-provenance results separately.
 
 Run one Stage 4 amendment-aware resolver case with:
 
@@ -52,3 +52,21 @@ Compare a completed resolver run with the preserved Stage 3 baseline using:
 ```
 
 Stage 5 uses an inspectable deterministic Evidence Accuracy rubric rather than a separate LLM judge. Answer cases require provenance-valid citations, the frozen benchmark's effective source, a citation at the returned effective-source locator, and quoted support for every normalized expected-value component. Abstention cases remain scored by Abstention Accuracy.
+
+After a deterministic reducer fix, replay saved extraction events without new API calls using:
+
+```bash
+.venv/bin/contract-stack replay-resolver \
+  --source-dir artifacts/stage5_resolver/<source-run-id> \
+  --output-dir artifacts/stage5_resolver/<replay-run-id>
+```
+
+Run the bounded relationship-driven third system from a preserved fixed-top-eight resolver run with:
+
+```bash
+.venv/bin/contract-stack relationship-benchmark \
+  --source-dir artifacts/stage5_resolver/<source-run-id> \
+  --output-dir artifacts/stage5_relationship/<run-id>
+```
+
+The final deterministic replays score the fixed-top-eight resolver at 90% Operative State, 80% Amendment Chain, 92% Evidence, 100% Abstention, and 100% provenance. The bounded relationship-driven resolver scores 96.67% Operative State, 96.67% Amendment Chain, 96% Evidence, 100% Abstention, and 100% provenance. It clears the 85% chain target and leaves A05 as the sole substantive failure. Full methodology and failure analysis are in `docs/stage5_evaluation.md`.

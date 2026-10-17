@@ -64,6 +64,13 @@ class ResolverRun:
     api_metadata: dict[str, Any] | None
 
 
+@dataclass(frozen=True)
+class ExtractionRun:
+    events: list[ProvisionEvent]
+    provenance_errors: list[str]
+    api_metadata: dict[str, Any] | None
+
+
 class ContractStackResolver:
     def __init__(self, client: OpenAI) -> None:
         self.client = client
@@ -92,6 +99,37 @@ class ContractStackResolver:
         if not retrieved:
             return _insufficient_run(query.attribute, query.subject, "No relevant evidence was retrieved.")
 
+        extraction_run = self.extract(question, retrieved)
+        if extraction_run.provenance_errors:
+            run = _insufficient_run(
+                query.attribute,
+                query.subject,
+                "Extracted provision evidence failed deterministic provenance validation.",
+            )
+            return ResolverRun(
+                result=run.result,
+                extracted_events=extraction_run.events,
+                ordered_events=[],
+                relationships=[],
+                extraction_provenance_errors=extraction_run.provenance_errors,
+                api_metadata=extraction_run.api_metadata,
+            )
+
+        reduction = reduce_provisions(query, extraction_run.events)
+        return ResolverRun(
+            result=reduction.result,
+            extracted_events=extraction_run.events,
+            ordered_events=reduction.ordered_events,
+            relationships=reduction.relationships,
+            extraction_provenance_errors=[],
+            api_metadata=extraction_run.api_metadata,
+        )
+
+    def extract(self, question: str, retrieved: list[RetrievedChunk]) -> ExtractionRun:
+        query = interpret_question(question)
+        if query.attribute == Attribute.UNSUPPORTED or not retrieved:
+            return ExtractionRun(events=[], provenance_errors=[], api_metadata=None)
+
         context = "\n\n".join(_format_chunk(item) for item in retrieved)
         response = self.client.responses.parse(
             model=GENERATION_MODEL,
@@ -109,28 +147,9 @@ class ContractStackResolver:
         all_evidence = [item for event in events for item in event.evidence]
         provenance_errors = validate_evidence_provenance(all_evidence, retrieved)
         metadata = _response_metadata(response)
-        if provenance_errors:
-            run = _insufficient_run(
-                query.attribute,
-                query.subject,
-                "Extracted provision evidence failed deterministic provenance validation.",
-            )
-            return ResolverRun(
-                result=run.result,
-                extracted_events=events,
-                ordered_events=[],
-                relationships=[],
-                extraction_provenance_errors=provenance_errors,
-                api_metadata=metadata,
-            )
-
-        reduction = reduce_provisions(query, events)
-        return ResolverRun(
-            result=reduction.result,
-            extracted_events=events,
-            ordered_events=reduction.ordered_events,
-            relationships=reduction.relationships,
-            extraction_provenance_errors=[],
+        return ExtractionRun(
+            events=events,
+            provenance_errors=provenance_errors,
             api_metadata=metadata,
         )
 

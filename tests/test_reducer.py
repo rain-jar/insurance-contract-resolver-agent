@@ -27,16 +27,21 @@ def _event(
     required: list[str] | None = None,
     supersedes: list[str] | None = None,
     attribute: Attribute = Attribute.LIMIT,
+    document_path: str | None = None,
 ) -> ProvisionEvent:
     return ProvisionEvent(
         attribute=attribute,
         subject="On Premises" if attribute != Attribute.POLICY_PERIOD else "Policy Period",
         operation=operation,
         value=value,
-        source=SourceRef(document_path=f"{label}.txt", provision_label=label, locator="paragraph:1"),
+        source=SourceRef(
+            document_path=document_path or f"{label}.txt",
+            provision_label=label,
+            locator="paragraph:1",
+        ),
         evidence=[
             EvidenceRef(
-                document_path=f"{label}.txt",
+                document_path=document_path or f"{label}.txt",
                 locator="paragraph:1",
                 quote=f"Evidence for {label}",
                 extraction_method=ExtractionMethod.TEXT,
@@ -167,3 +172,122 @@ def test_source_label_normalization_removes_only_provenance_annotation() -> None
     assert normalized.source.provision_label == "Endorsement 8"
     assert normalized.source.document_path == event.source.document_path
     assert normalized.evidence == event.evidence
+
+
+def test_equivalent_base_extractions_from_one_document_are_coalesced() -> None:
+    query = QuerySpec(attribute=Attribute.POLICY_PERIOD, subject="Policy Period")
+    base_value = _value(start="2026-06-30T00:01:00", end="2027-06-30T00:01:00")
+    amended_value = _value(start="2026-06-30T12:00:00", end="2027-06-30T12:00:00")
+    events = [
+        _event(
+            "Base risk details Bond Period",
+            Operation.BASE,
+            base_value,
+            attribute=Attribute.POLICY_PERIOD,
+            document_path="policy.pdf",
+        ),
+        _event(
+            "Base declarations Item 2",
+            Operation.BASE,
+            base_value,
+            attribute=Attribute.POLICY_PERIOD,
+            document_path="policy.pdf",
+        ),
+        _event(
+            "Rider 17",
+            Operation.AMEND,
+            amended_value,
+            number=17,
+            required=["Base declarations Item 2"],
+            attribute=Attribute.POLICY_PERIOD,
+            document_path="policy.pdf",
+        ),
+    ]
+
+    outcome = reduce_provisions(query, events)
+
+    assert outcome.result.status == ResolutionStatus.ANSWER
+    assert outcome.result.normalized_value == amended_value
+    assert [step.source for step in outcome.result.amendment_chain] == [
+        "Rider 17",
+    ]
+    assert len(outcome.result.evidence) == 3
+
+
+def test_complete_first_amendment_roots_operative_chain_but_preserves_base_evidence() -> None:
+    query = QuerySpec(attribute=Attribute.POLICY_PERIOD, subject="Policy Period")
+    base = _event(
+        "Base declarations Item 2",
+        Operation.BASE,
+        _value(start="2026-06-30T00:01:00", end="2027-06-30T00:01:00"),
+        attribute=Attribute.POLICY_PERIOD,
+    )
+    amendment = _event(
+        "Rider 17",
+        Operation.AMEND,
+        _value(start="2026-06-30T12:00:00", end="2027-06-30T12:00:00"),
+        number=17,
+        required=["Base declarations Item 2"],
+        attribute=Attribute.POLICY_PERIOD,
+    )
+
+    outcome = reduce_provisions(query, [base, amendment])
+
+    assert [event.source.provision_label for event in outcome.ordered_events] == [
+        "Base declarations Item 2",
+        "Rider 17",
+    ]
+    assert [step.source for step in outcome.result.amendment_chain] == ["Rider 17"]
+    assert {item.quote for item in outcome.result.evidence} == {
+        "Evidence for Base declarations Item 2",
+        "Evidence for Rider 17",
+    }
+
+
+def test_partial_first_amendment_does_not_remove_base_from_chain() -> None:
+    query = QuerySpec(attribute=Attribute.POLICY_PERIOD, subject="Policy Period")
+    events = [
+        _event(
+            "Base declarations Item 2",
+            Operation.BASE,
+            _value(start="2026-06-30T00:01:00", end="2027-06-30T00:01:00"),
+            attribute=Attribute.POLICY_PERIOD,
+        ),
+        _event(
+            "Rider 18",
+            Operation.AMEND,
+            _value(end="2027-09-30T12:00:00"),
+            number=18,
+            attribute=Attribute.POLICY_PERIOD,
+        ),
+    ]
+
+    outcome = reduce_provisions(query, events)
+
+    assert [step.source for step in outcome.result.amendment_chain] == [
+        "Base declarations Item 2",
+        "Rider 18",
+    ]
+
+
+def test_distinct_base_values_are_not_coalesced() -> None:
+    query = QuerySpec(attribute=Attribute.LIMIT, subject="On Premises")
+    events = [
+        _event(
+            "Base schedule A",
+            Operation.BASE,
+            _value(amount=1_000_000, currency="USD"),
+            document_path="policy.pdf",
+        ),
+        _event(
+            "Base schedule B",
+            Operation.BASE,
+            _value(amount=2_000_000, currency="USD"),
+            document_path="policy.pdf",
+        ),
+    ]
+
+    outcome = reduce_provisions(query, events)
+
+    assert outcome.result.status == ResolutionStatus.INSUFFICIENT_EVIDENCE
+    assert "Precedence is unresolved" in outcome.result.reason

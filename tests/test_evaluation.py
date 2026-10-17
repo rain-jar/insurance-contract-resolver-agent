@@ -115,6 +115,20 @@ def test_evidence_accuracy_supports_partial_period_across_citations() -> None:
 
     assert evidence_accuracy_errors(expected, actual, []) == []
 
+    wrong_time = actual.model_copy(
+        update={
+            "evidence": [
+                actual.evidence[0],
+                actual.evidence[1].model_copy(
+                    update={"quote": "Inception is replaced by 1 March 2027 at 12:01 a.m."}
+                ),
+            ]
+        }
+    )
+    assert evidence_accuracy_errors(expected, wrong_time, []) == [
+        "The evidence does not quote the expected start date."
+    ]
+
 
 def test_evidence_accuracy_excludes_non_answer_cases() -> None:
     expected = {

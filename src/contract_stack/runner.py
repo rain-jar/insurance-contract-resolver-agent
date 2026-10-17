@@ -25,10 +25,20 @@ from .evaluation import (
     operative_state_correct,
 )
 from .ingestion import DocumentIngestor
-from .models import ResolutionStatus
+from .models import (
+    Attribute,
+    ProvisionEvent,
+    ProvisionRelationship,
+    ResolutionResult,
+    ResolutionStatus,
+    RetrievedChunk,
+)
 from .pipeline import ingest_stack
 from .provenance import validate_evidence_provenance
-from .resolver import EXTRACTION_INSTRUCTIONS, ContractStackResolver
+from .questions import interpret_question
+from .reducer import reduce_provisions
+from .relationship_retrieval import RelationshipDrivenResolver
+from .resolver import EXTRACTION_INSTRUCTIONS, ContractStackResolver, ResolverRun
 from .retrieval import HybridRetriever, OpenAIEmbedder
 
 
@@ -213,6 +223,188 @@ def run_resolver_benchmark(
 
     summary = aggregate_results(records, expected_count=len(cases))
     summary["completed_at_utc"] = datetime.now(UTC).isoformat()
+    _write_json(output_dir / "summary.json", summary)
+    return summary
+
+
+def replay_resolver_benchmark(
+    cases: list[dict[str, Any]], source_dir: Path, output_dir: Path
+) -> dict[str, Any]:
+    if source_dir.resolve() == output_dir.resolve():
+        raise ValueError("A replay must use a new output directory to preserve the source run.")
+    source_manifest_path = source_dir / "manifest.json"
+    source_manifest = json.loads(source_manifest_path.read_text(encoding="utf-8"))
+    is_relationship_run = source_manifest.get("system") == (
+        "relationship_driven_contract_stack_resolver"
+    )
+    event_field = "combined_events" if is_relationship_run else "extracted_events"
+    output_manifest = dict(source_manifest)
+    output_manifest.update(
+        {
+            "started_at_utc": datetime.now(UTC).isoformat(),
+            "system": (
+                "relationship_driven_contract_stack_resolver_deterministic_replay"
+                if is_relationship_run
+                else "contract_stack_resolver_deterministic_replay"
+            ),
+            "derived_from": source_dir.as_posix(),
+            "source_manifest_sha256": _sha256_file(source_manifest_path),
+            "replay_scope": (
+                f"Saved {event_field} rerun through deterministic reduction and evaluation."
+            ),
+        }
+    )
+    _write_json(output_dir / "manifest.json", output_manifest)
+
+    records: list[dict[str, Any]] = []
+    for index, case in enumerate(cases, start=1):
+        source_path = source_dir / "cases" / f"{case['case_id']}.json"
+        source_record = json.loads(source_path.read_text(encoding="utf-8"))
+        if source_record.get("error") is not None:
+            raise ValueError(f"Cannot replay failed source record: {source_path}")
+        started = time.monotonic()
+        query = interpret_question(case["question"])
+        retrieved = [
+            RetrievedChunk.model_validate(item) for item in source_record["retrieved"]
+        ]
+        if query.attribute == Attribute.UNSUPPORTED or source_record.get(
+            "extraction_provenance_errors"
+        ):
+            result = ResolutionResult.model_validate(source_record["result"])
+            ordered_events = [
+                ProvisionEvent.model_validate(item)
+                for item in source_record.get("ordered_events", [])
+            ]
+            relationships = source_record.get("relationships", [])
+        else:
+            events = [
+                ProvisionEvent.model_validate(item)
+                for item in source_record[event_field]
+            ]
+            reduction = reduce_provisions(query, events)
+            result = reduction.result
+            ordered_events = reduction.ordered_events
+            relationships = [
+                relationship.model_dump(mode="json")
+                for relationship in reduction.relationships
+            ]
+
+        result_provenance_errors = validate_evidence_provenance(result.evidence, retrieved)
+        evidence_errors = evidence_accuracy_errors(case, result, result_provenance_errors)
+        is_answer = result.status == ResolutionStatus.ANSWER
+        record = dict(source_record)
+        record.update(
+            {
+                "result": result.model_dump(mode="json"),
+                "ordered_events": [
+                    event.model_dump(mode="json") for event in ordered_events
+                ],
+                "relationships": relationships,
+                "result_provenance_errors": result_provenance_errors,
+                "evidence_accuracy_errors": evidence_errors,
+                "metrics": {
+                    "operative_state_correct": operative_state_correct(case, result),
+                    "amendment_chain_correct": amendment_chain_correct(case, result),
+                    "abstention_correct": (
+                        abstention_correct(case, result)
+                        if case["expected_behavior"] != ResolutionStatus.ANSWER.value
+                        else None
+                    ),
+                    "citation_provenance_valid": (
+                        not result_provenance_errors if is_answer else None
+                    ),
+                    "evidence_accurate": (
+                        not evidence_errors if evidence_errors is not None else None
+                    ),
+                    "semantic_evidence_accuracy": "NOT_SCORED",
+                },
+                "error": None,
+                "replay": {
+                    "source_record": source_path.as_posix(),
+                    "elapsed_seconds": round(time.monotonic() - started, 6),
+                },
+            }
+        )
+        _write_json(output_dir / "cases" / f"{case['case_id']}.json", record)
+        records.append(record)
+        print(
+            f"[{index}/{len(cases)}] {case['case_id']}: {result.status.value}",
+            flush=True,
+        )
+
+    summary = aggregate_results(records, expected_count=len(cases))
+    summary["completed_at_utc"] = datetime.now(UTC).isoformat()
+    summary["derived_from"] = source_dir.as_posix()
+    _write_json(output_dir / "summary.json", summary)
+    return summary
+
+
+def run_relationship_benchmark(
+    cases: list[dict[str, Any]],
+    benchmark_root: Path,
+    source_dir: Path,
+    output_dir: Path,
+    *,
+    client: OpenAI,
+    max_added_chunks: int = 2,
+) -> dict[str, Any]:
+    if source_dir.resolve() == output_dir.resolve():
+        raise ValueError("The third-system run must not overwrite its source resolver run.")
+    source_manifest_path = source_dir / "manifest.json"
+    source_manifest = json.loads(source_manifest_path.read_text(encoding="utf-8"))
+    manifest = dict(source_manifest)
+    manifest.update(
+        {
+            "started_at_utc": datetime.now(UTC).isoformat(),
+            "system": "relationship_driven_contract_stack_resolver",
+            "derived_from": source_dir.as_posix(),
+            "source_manifest_sha256": _sha256_file(source_manifest_path),
+            "relationship_retrieval": {
+                "initial_retrieval_reused": True,
+                "maximum_expansion_rounds": 1,
+                "maximum_added_chunks": max_added_chunks,
+                "maximum_additional_extraction_calls": 1,
+                "candidate_ranking": "deterministic lexical BM25+ over relationship-filtered chunks",
+            },
+        }
+    )
+    _write_json(output_dir / "manifest.json", manifest)
+
+    cases_dir = output_dir / "cases"
+    cases_dir.mkdir(parents=True, exist_ok=True)
+    ingestor = DocumentIngestor(cache_dir=Path(".cache/ingestion"))
+    resolver = RelationshipDrivenResolver(client, max_added_chunks=max_added_chunks)
+    records: list[dict[str, Any]] = []
+    for index, case in enumerate(cases, start=1):
+        case_path = cases_dir / f"{case['case_id']}.json"
+        if case_path.exists():
+            record = json.loads(case_path.read_text(encoding="utf-8"))
+            if _is_retryable_saved_error(record):
+                _archive_failed_attempt(case_path, record)
+                record = _run_relationship_case(
+                    case, benchmark_root, source_dir, ingestor, resolver
+                )
+                _write_json(case_path, record)
+                outcome = "error" if record["error"] else record["result"]["status"]
+                print(
+                    f"[{index}/{len(cases)}] {case['case_id']}: retried -> {outcome}",
+                    flush=True,
+                )
+            else:
+                print(f"[{index}/{len(cases)}] {case['case_id']}: resumed", flush=True)
+        else:
+            record = _run_relationship_case(
+                case, benchmark_root, source_dir, ingestor, resolver
+            )
+            _write_json(case_path, record)
+            outcome = "error" if record["error"] else record["result"]["status"]
+            print(f"[{index}/{len(cases)}] {case['case_id']}: {outcome}", flush=True)
+        records.append(record)
+        _write_json(output_dir / "summary.json", aggregate_results(records, expected_count=len(cases)))
+
+    summary = aggregate_results(records, expected_count=len(cases))
+    summary["completed_at_utc"] = datetime.now(UTC).isoformat()
+    summary["derived_from"] = source_dir.as_posix()
     _write_json(output_dir / "summary.json", summary)
     return summary
 
@@ -406,6 +598,213 @@ def _run_resolver_case(
         )
     base_record["elapsed_seconds"] = round(time.monotonic() - started, 3)
     return base_record
+
+
+def _run_relationship_case(
+    case: dict[str, Any],
+    benchmark_root: Path,
+    source_dir: Path,
+    ingestor: DocumentIngestor,
+    resolver: RelationshipDrivenResolver,
+) -> dict[str, Any]:
+    started = time.monotonic()
+    source_path = source_dir / "cases" / f"{case['case_id']}.json"
+    base_record: dict[str, Any] = {
+        "case_id": case["case_id"],
+        "case_type": case["case_type"],
+        "question": case["question"],
+        "contract_stack": case["contract_stack"],
+        "expected": {
+            "expected_behavior": case["expected_behavior"],
+            "expected_answer": case.get("expected_answer"),
+            "effective_source": case.get("effective_source"),
+            "required_evidence": case["required_evidence"],
+            "amendment_chain": case["amendment_chain"],
+        },
+        "source_record": source_path.as_posix(),
+    }
+    try:
+        source_record = json.loads(source_path.read_text(encoding="utf-8"))
+        if source_record.get("error") is not None:
+            raise ValueError("The paired initial resolver record contains an error.")
+        initial_retrieved = [
+            RetrievedChunk.model_validate(item) for item in source_record["retrieved"]
+        ]
+        initial_run = ResolverRun(
+            result=ResolutionResult.model_validate(source_record["result"]),
+            extracted_events=[
+                ProvisionEvent.model_validate(item)
+                for item in source_record["extracted_events"]
+            ],
+            ordered_events=[
+                ProvisionEvent.model_validate(item)
+                for item in source_record.get("ordered_events", [])
+            ],
+            relationships=[
+                ProvisionRelationship.model_validate(item)
+                for item in source_record.get("relationships", [])
+            ],
+            extraction_provenance_errors=source_record.get(
+                "extraction_provenance_errors", []
+            ),
+            api_metadata=source_record.get("api_metadata"),
+        )
+        chunks = ingest_stack(benchmark_root, case["contract_stack"], ingestor)
+        run = resolver.resolve_from_initial(
+            case["question"], chunks, initial_retrieved, initial_run
+        )
+        retrieved = [*initial_retrieved, *run.expansion.added]
+        result_provenance_errors = validate_evidence_provenance(
+            run.result.evidence, retrieved
+        )
+        evidence_errors = evidence_accuracy_errors(
+            case, run.result, result_provenance_errors
+        )
+        is_answer = run.result.status == ResolutionStatus.ANSWER
+        base_record.update(
+            {
+                "result": run.result.model_dump(mode="json"),
+                "initial_result": initial_run.result.model_dump(mode="json"),
+                "initial_extracted_events": [
+                    event.model_dump(mode="json")
+                    for event in initial_run.extracted_events
+                ],
+                "expansion_events": [
+                    event.model_dump(mode="json") for event in run.expansion_events
+                ],
+                "combined_events": [
+                    event.model_dump(mode="json") for event in run.combined_events
+                ],
+                "ordered_events": [
+                    event.model_dump(mode="json") for event in run.ordered_events
+                ],
+                "relationships": [
+                    relationship.model_dump(mode="json")
+                    for relationship in run.relationships
+                ],
+                "relationship_expansion": {
+                    "triggered": run.expansion.triggered,
+                    "reasons": run.expansion.reasons,
+                    "query": run.expansion.query,
+                    "added": [
+                        item.model_dump(mode="json") for item in run.expansion.added
+                    ],
+                },
+                "retrieved": [item.model_dump(mode="json") for item in retrieved],
+                "initial_api_metadata": initial_run.api_metadata,
+                "expansion_api_metadata": run.expansion_api_metadata,
+                "api_metadata": _combine_api_metadata(
+                    initial_run.api_metadata, run.expansion_api_metadata
+                ),
+                "extraction_provenance_errors": initial_run.extraction_provenance_errors,
+                "expansion_provenance_errors": run.expansion_provenance_errors,
+                "result_provenance_errors": result_provenance_errors,
+                "evidence_accuracy_errors": evidence_errors,
+                "metrics": {
+                    "operative_state_correct": operative_state_correct(case, run.result),
+                    "amendment_chain_correct": amendment_chain_correct(case, run.result),
+                    "abstention_correct": (
+                        abstention_correct(case, run.result)
+                        if case["expected_behavior"] != ResolutionStatus.ANSWER.value
+                        else None
+                    ),
+                    "citation_provenance_valid": (
+                        not result_provenance_errors if is_answer else None
+                    ),
+                    "evidence_accurate": (
+                        not evidence_errors if evidence_errors is not None else None
+                    ),
+                    "semantic_evidence_accuracy": "NOT_SCORED",
+                },
+                "error": None,
+            }
+        )
+    except Exception as exc:
+        base_record.update(
+            {
+                "result": None,
+                "initial_result": None,
+                "initial_extracted_events": [],
+                "expansion_events": [],
+                "combined_events": [],
+                "ordered_events": [],
+                "relationships": [],
+                "relationship_expansion": None,
+                "retrieved": [],
+                "initial_api_metadata": None,
+                "expansion_api_metadata": None,
+                "api_metadata": None,
+                "extraction_provenance_errors": [],
+                "expansion_provenance_errors": [],
+                "result_provenance_errors": [],
+                "evidence_accuracy_errors": (
+                    ["The case failed before evidence could be evaluated."]
+                    if case["expected_behavior"] == ResolutionStatus.ANSWER.value
+                    else None
+                ),
+                "metrics": {
+                    "operative_state_correct": False,
+                    "amendment_chain_correct": False,
+                    "abstention_correct": (
+                        False
+                        if case["expected_behavior"] != ResolutionStatus.ANSWER.value
+                        else None
+                    ),
+                    "citation_provenance_valid": None,
+                    "evidence_accurate": (
+                        False
+                        if case["expected_behavior"] == ResolutionStatus.ANSWER.value
+                        else None
+                    ),
+                    "semantic_evidence_accuracy": "NOT_SCORED",
+                },
+                "error": {"type": type(exc).__name__, "message": str(exc)},
+            }
+        )
+    base_record["elapsed_seconds"] = round(time.monotonic() - started, 3)
+    return base_record
+
+
+def _combine_api_metadata(
+    initial: dict[str, Any] | None, expansion: dict[str, Any] | None
+) -> dict[str, Any] | None:
+    if initial is None and expansion is None:
+        return None
+    usage_keys = (
+        "input_tokens",
+        "output_tokens",
+        "total_tokens",
+    )
+    usage = {
+        key: sum((metadata or {}).get("usage", {}).get(key, 0) for metadata in (initial, expansion))
+        for key in usage_keys
+    }
+    usage["input_tokens_details"] = {
+        "cached_tokens": sum(
+            (metadata or {})
+            .get("usage", {})
+            .get("input_tokens_details", {})
+            .get("cached_tokens", 0)
+            for metadata in (initial, expansion)
+        ),
+        "cache_write_tokens": sum(
+            (metadata or {})
+            .get("usage", {})
+            .get("input_tokens_details", {})
+            .get("cache_write_tokens", 0)
+            for metadata in (initial, expansion)
+        ),
+    }
+    usage["output_tokens_details"] = {
+        "reasoning_tokens": sum(
+            (metadata or {})
+            .get("usage", {})
+            .get("output_tokens_details", {})
+            .get("reasoning_tokens", 0)
+            for metadata in (initial, expansion)
+        )
+    }
+    return {"initial": initial, "expansion": expansion, "usage": usage}
 
 
 def aggregate_results(records: list[dict[str, Any]], *, expected_count: int) -> dict[str, Any]:

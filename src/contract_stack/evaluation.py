@@ -182,4 +182,29 @@ def _quote_contains_date(quote: str, iso_value: str) -> bool:
         rf"\b0?{value.month}/0?{day}/{year}\b",
         rf"\b0?{day}/0?{value.month}/{year}\b",
     ]
+    return any(re.search(pattern, quote, re.I) for pattern in patterns) and _time_supported(
+        quote, value
+    )
+
+
+def _time_supported(quote: str, value: datetime) -> bool:
+    if value.hour == 12 and value.minute == 0:
+        patterns = (
+            r"\b12(?::00)?\s*noon\b",
+            r"\b12:00\s*p\.?m\.?\b",
+            r"\b12:00\b(?!\s*[ap]\.?m\.?)",
+        )
+    elif value.hour == 0:
+        twelve_hour_minute = f"{value.minute:02d}"
+        patterns = (
+            rf"\b12[:.]?{twelve_hour_minute}\s*a\.?m\.?\b",
+            rf"\b00:{twelve_hour_minute}\b",
+        )
+    else:
+        hour_12 = value.hour if value.hour <= 12 else value.hour - 12
+        suffix = "a" if value.hour < 12 else "p"
+        patterns = (
+            rf"\b{value.hour:02d}:{value.minute:02d}\b",
+            rf"\b{hour_12}:{value.minute:02d}\s*{suffix}\.?m\.?\b",
+        )
     return any(re.search(pattern, quote, re.I) for pattern in patterns)

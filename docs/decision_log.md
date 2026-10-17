@@ -1,5 +1,19 @@
 # Decision Log
 
+## 2026-10-16 - Bounded relationship retrieval and complete-AMEND chain root
+
+An approved third-system ablation adds one bounded relationship-driven retrieval round to the amendment-aware resolver. It reuses top-eight retrieval and initial extraction, adds at most two relationship-relevant chunks, makes at most one additional extraction call, and leaves provenance and abstention rules unchanged. The completed run made five additional calls and recovered the missing Rider 17 in every targeted contract stack.
+
+The run exposed a chain-output distinction: a complete first `AMEND` establishes a new operative state even though the earlier base remains necessary for ordering and provenance. The approved deterministic correction begins the reported operative chain at such an amendment while retaining the base in reduction and evidence. It does not apply to partial amendments or replacement-style operations.
+
+Deterministic replays produced 90% Operative State, 80% Amendment Chain, 92% Evidence, 100% Abstention, and 100% provenance for the fixed-top-eight resolver; and 96.67% Operative State, 96.67% Amendment Chain, 96% Evidence, 100% Abstention, and 100% provenance for the relationship-driven resolver. The benchmark remained frozen and no new API calls were used for the replays. A05 is the sole remaining substantive failure.
+
+## 2026-10-16 - Equivalent base-event fix and deterministic replay
+
+The completed initial resolver evaluation exposed a deterministic false conflict: the extraction model sometimes represented the same base policy period twice using the broker risk details and declarations labels. The reducer now coalesces `BASE` events only when document, attribute, subject, operation, and normalized value are identical. It merges evidence and prefers a label explicitly referenced by another extracted event. Different values remain distinct, preserving genuine conflict abstention.
+
+The initial API-backed run remains unchanged. Its saved extractions were replayed through the corrected reducer in a separate derived run, avoiding new model variance. Final replay metrics are 90% Operative State, 92% Evidence, 76.67% Amendment Chain, 100% Abstention, and 100% Citation Provenance. The resolver improves chain accuracy and abstention over direct RAG but does not meet the 85% chain target because Rider 17 is repeatedly absent from the shared top-eight retrieval.
+
 ## 2026-10-16 - Stage 5 evidence evaluation and interrupted initial run
 
 Stage 5 uses a deterministic Evidence Accuracy rubric rather than a separate rubric-based LLM evaluator. The metric covers the 25 frozen `ANSWER` cases and requires provenance-valid citations, the expected effective source, a citation at the returned effective-source locator, and quoted support for each normalized expected-value component. Abstention evidence is evaluated separately through Abstention Accuracy. Rescoring the preserved Stage 3 baseline produces 24/25 (96%) Evidence Accuracy; A05 fails because its operative endorsement was not retrieved.
