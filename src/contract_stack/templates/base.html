@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page_title }} · Contract Stack Resolver</title>
+    <meta name="description" content="Trace operative insurance terms through policy amendments and endorsements.">
+    <link rel="stylesheet" href="{{ url_for('static', path='/app.css') }}">
+    <script src="{{ url_for('static', path='/app.js') }}" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <div class="shell header-inner">
+        <a class="brand" href="/" aria-label="Contract Stack Resolver home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>
+            <strong>Contract Stack</strong>
+            <small>Resolver</small>
+          </span>
+        </a>
+        <div class="environment-badge"><span></span> Local workspace</div>
+      </div>
+    </header>
+    <main id="main-content" class="shell page-shell">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer">
+      <div class="shell footer-inner">
+        <span>Decision support with inspectable provenance</span>
+        <span>Files remain on this device</span>
+      </div>
+    </footer>
+  </body>
+</html>

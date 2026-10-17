@@ -70,3 +70,23 @@ Run the bounded relationship-driven third system from a preserved fixed-top-eigh
 ```
 
 The final deterministic replays score the fixed-top-eight resolver at 90% Operative State, 80% Amendment Chain, 92% Evidence, 100% Abstention, and 100% provenance. The bounded relationship-driven resolver scores 96.67% Operative State, 96.67% Amendment Chain, 96% Evidence, 100% Abstention, and 100% provenance. It clears the 85% chain target and leaves A05 as the sole substantive failure. Full methodology and failure analysis are in `docs/stage5_evaluation.md`.
+
+## Stage 6 productization
+
+Stage 6 wraps the validated resolver in a single-reviewer contract-analysis application without changing the frozen experiment. Stage 6A adds an injectable structured-generation boundary and a framework-independent analysis service with document validation, ingestion, hashing, retrieval, bounded relationship resolution, and audit-ready metadata. Stage 6B adds local persistence and an HTTP API. Stage 6C adds the reviewer workflow and background analysis execution. See `docs/stage6_productization_plan.md`.
+
+With `OPENAI_API_KEY` set, start the local application using:
+
+```bash
+.venv/bin/contract-stack-api
+```
+
+The application binds to `127.0.0.1:8000` and stores local data under the ignored `.local/contract-stack` directory. Open `http://127.0.0.1:8000/` for the reviewer interface or `http://127.0.0.1:8000/docs` for interactive API documentation. It is intentionally unauthenticated and must not be exposed to a network. See `docs/stage6_api.md` and `docs/stage6_ui.md` for the API, workflow, persistence, deletion, audit records, and security boundary.
+
+For the containerized local release, place `OPENAI_API_KEY` in the ignored `.env` file and run:
+
+```bash
+docker compose up --build
+```
+
+Compose publishes only to `127.0.0.1:8000` and retains application data in a named volume. Stop it with `docker compose down`; add `--volumes` only when you intentionally want to delete all retained stacks. Optional automatic expiry, structured logs, retry behavior, backup guidance, and container operations are documented in `docs/stage6_operations.md`.

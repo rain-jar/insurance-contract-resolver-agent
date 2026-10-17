@@ -1,0 +1,15 @@
+services:
+  contract-stack:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?Set OPENAI_API_KEY before starting}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    volumes:
+      - contract-stack-data:/data
+    restart: unless-stopped
+
+volumes:
+  contract-stack-data:

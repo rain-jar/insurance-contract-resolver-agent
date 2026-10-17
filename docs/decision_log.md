@@ -1,5 +1,35 @@
 # Decision Log
 
+## 2026-10-16 - Stage 6D split into local release hardening and later unseen evaluation
+
+The local pilot will be released before constructing a separately versioned unseen evaluation set. Stage 5 remains the current benchmark evidence, but because it informed reducer fixes and relationship-driven retrieval, the release will not claim that Stage 5 is an untouched generalization test. A small independently grounded unseen evaluation and formal release thresholds are deferred until after workflow feedback from the pilot.
+
+The release-hardening scope adds a non-root OCR-capable container, loopback-only Compose publishing, persistent storage, health checking, privacy-safe structured request and analysis events, correlation IDs, explicit reviewer retry, interrupted-job recovery, and optional startup retention cleanup. The in-process single worker remains appropriate only to the approved trusted local reviewer boundary; public or multi-user deployment still requires authentication, durable jobs, and a separate security review.
+
+After release packaging, a manual external smoke test used a newly filed First American Funds Trust bond that is absent from the repository and benchmark. The full path returned the correct USD 100,000 Uncollectible Items of Deposit limit, identified Endorsement 19 and its amendment to Item 4, and displayed supporting evidence. This result is recorded as a single successful smoke test and is not represented as the deferred formal unseen evaluation.
+
+## 2026-10-16 - Stage 6C local reviewer workflow
+
+The first reviewer interface is server-rendered and local-only. It exposes contract-stack upload, review, manual deletion, analysis history, background question submission, visible processing/failure states, and an auditable answer view that keeps the operative value, effective source, ordered amendment chain, and evidence quotations together. It deliberately avoids a separate JavaScript application.
+
+Analysis work runs through one in-process background worker. This is sufficient for the approved trusted single-reviewer boundary and prevents long model calls from occupying the browser request. It is not a durable job system: pending or running records are explicitly failed on restart so they cannot remain misleadingly active. A deployable multi-user service would require an external job system and authentication in a later approved stage.
+
+Browser forms use randomized double-submit CSRF tokens, unsafe mutations accept only local origins, templates autoescape output, and no document text is added to ordinary logs. UI integration tests use fake generation and spend no model credits. The frozen benchmark remains untouched.
+
+## 2026-10-16 - Stage 6B local persistent API
+
+The first product API uses FastAPI, a versioned SQLite schema, and controlled stack-scoped filesystem storage. It binds to loopback, accepts only trusted local host headers, and has no authentication under the approved single-reviewer local boundary. It must not be exposed to a network.
+
+Uploads are bounded and staged atomically. A stack directory contains both original documents and derived ingestion/embedding caches so manual deletion covers all local document-derived data. Completed analyses persist the operative result, provision events, relationships, provenance outcomes, generation and embedding configuration/usage, hashes, and timing without exposing absolute source paths.
+
+Stage 6B analysis submission is synchronous. Lifecycle states and failed analyses are persisted now; background execution and reviewer-facing progress belong to Stage 6C. API integration tests use fake generation and do not spend model credits.
+
+## 2026-10-16 - Stage 6 product boundary approved
+
+Stage 6 productizes the validated relationship-driven resolver as a trusted single-reviewer local application. The first release will retain uploaded source documents locally until manual deletion and use FastAPI, a server-rendered interface, and SQLite. The validated resolver remains a framework-independent domain core; product code wraps it rather than rewriting it.
+
+Stage 6A introduces an injectable structured-generation boundary, an application analysis service, production input limits, document hashes, timing, and audit-ready execution metadata. Persistence, HTTP endpoints, and the reviewer interface remain separate later phases. Automated tests use fake generation and must not require paid API calls.
+
 ## 2026-10-16 - Bounded relationship retrieval and complete-AMEND chain root
 
 An approved third-system ablation adds one bounded relationship-driven retrieval round to the amendment-aware resolver. It reuses top-eight retrieval and initial extraction, adds at most two relationship-relevant chunks, makes at most one additional extraction call, and leaves provenance and abstention rules unchanged. The completed run made five additional calls and recovered the missing Rider 17 in every targeted contract stack.

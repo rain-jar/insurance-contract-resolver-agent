@@ -2,17 +2,13 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from datetime import UTC, datetime
 from typing import Any
 
 from openai import OpenAI
 
-from .baseline import (
-    GENERATION_MODEL,
-    MAX_OUTPUT_TOKENS,
-    REASONING_EFFORT,
-    REASONING_MODE,
-    SERVICE_TIER,
+from .generation import (
+    StructuredGenerator,
+    as_structured_generator,
 )
 from .models import (
     Attribute,
@@ -72,8 +68,8 @@ class ExtractionRun:
 
 
 class ContractStackResolver:
-    def __init__(self, client: OpenAI) -> None:
-        self.client = client
+    def __init__(self, generator: StructuredGenerator | OpenAI) -> None:
+        self.generator = as_structured_generator(generator)
 
     def resolve(self, question: str, retrieved: list[RetrievedChunk]) -> ResolverRun:
         query = interpret_question(question)
@@ -131,43 +127,20 @@ class ContractStackResolver:
             return ExtractionRun(events=[], provenance_errors=[], api_metadata=None)
 
         context = "\n\n".join(_format_chunk(item) for item in retrieved)
-        response = self.client.responses.parse(
-            model=GENERATION_MODEL,
+        generation = self.generator.generate(
             instructions=EXTRACTION_INSTRUCTIONS,
-            input=f"QUESTION\n{question}\n\nRETRIEVED EVIDENCE\n{context}",
-            reasoning={"effort": REASONING_EFFORT, "mode": REASONING_MODE},
-            service_tier=SERVICE_TIER,
-            max_output_tokens=MAX_OUTPUT_TOKENS,
-            text_format=ProvisionExtraction,
+            prompt=f"QUESTION\n{question}\n\nRETRIEVED EVIDENCE\n{context}",
+            response_model=ProvisionExtraction,
         )
-        if response.output_parsed is None:
-            raise RuntimeError("The model response did not contain parsed provision events")
-        extraction = response.output_parsed
+        extraction = generation.output
         events = [_normalize_source_label(event) for event in extraction.events]
         all_evidence = [item for event in events for item in event.evidence]
         provenance_errors = validate_evidence_provenance(all_evidence, retrieved)
-        metadata = _response_metadata(response)
         return ExtractionRun(
             events=events,
             provenance_errors=provenance_errors,
-            api_metadata=metadata,
+            api_metadata=generation.metadata,
         )
-
-
-def _response_metadata(response: Any) -> dict[str, Any]:
-    usage = response.usage.model_dump(mode="json") if response.usage is not None else None
-    return {
-        "response_id": response.id,
-        "requested_model": GENERATION_MODEL,
-        "response_model": response.model,
-        "reasoning_effort": REASONING_EFFORT,
-        "reasoning_mode": REASONING_MODE,
-        "requested_service_tier": SERVICE_TIER,
-        "response_service_tier": response.service_tier,
-        "max_output_tokens": MAX_OUTPUT_TOKENS,
-        "completed_at_utc": datetime.now(UTC).isoformat(),
-        "usage": usage,
-    }
 
 
 def _format_chunk(item: RetrievedChunk) -> str:

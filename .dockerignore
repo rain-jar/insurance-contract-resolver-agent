@@ -1,0 +1,14 @@
+.git
+.github
+.venv
+.local
+.cache
+.pytest_cache
+artifacts
+benchmark_v1
+docs
+tests
+__pycache__
+*.pyc
+.env
+.DS_Store

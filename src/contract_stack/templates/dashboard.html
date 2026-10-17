@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+  <section class="hero compact-hero">
+    <div>
+      <p class="eyebrow">Reviewer workspace</p>
+      <h1>Find the term that governs now.</h1>
+      <p class="hero-copy">Upload a base policy with its endorsements and riders. The resolver reconstructs the amendment chain, identifies the operative provision, and keeps every conclusion tied to source evidence.</p>
+    </div>
+    <a class="button primary" href="/stacks/new">New contract stack <span aria-hidden="true">→</span></a>
+  </section>
+
+  <section class="metric-strip" aria-label="Workspace summary">
+    <div><strong>{{ stack_count }}</strong><span>Contract stacks</span></div>
+    <div><strong>{{ document_count }}</strong><span>Source documents</span></div>
+    <div><strong>3</strong><span>Supported term types</span></div>
+  </section>
+
+  <section class="section-heading">
+    <div>
+      <p class="eyebrow">Saved work</p>
+      <h2>Contract stacks</h2>
+    </div>
+  </section>
+
+  {% if stacks %}
+    <div class="stack-grid">
+      {% for stack in stacks %}
+        <a class="stack-card" href="/stacks/{{ stack.id }}">
+          <div class="document-glyph" aria-hidden="true"><span></span><span></span><span></span></div>
+          <div class="stack-card-body">
+            <h3>{{ stack.title }}</h3>
+            <p>{{ stack.document_count }} document{% if stack.document_count != 1 %}s{% endif %}</p>
+          </div>
+          <span class="card-arrow" aria-hidden="true">↗</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <section class="empty-state">
+      <div class="empty-icon" aria-hidden="true">§</div>
+      <h3>No contract stacks yet</h3>
+      <p>Create a workspace for a base policy and the documents that modify it.</p>
+      <a class="button secondary" href="/stacks/new">Create your first stack</a>
+    </section>
+  {% endif %}
+{% endblock %}

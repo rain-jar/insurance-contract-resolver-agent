@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block content %}
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Contract stacks</a><span>/</span><span>New</span></nav>
+  <div class="split-layout form-layout">
+    <section>
+      <p class="eyebrow">New review</p>
+      <h1>Create a contract stack</h1>
+      <p class="lede">Keep the base policy and every related endorsement, rider, or amendment together. Document order does not need to be perfect—the resolver uses explicit relationships to reconstruct it.</p>
+      <aside class="scope-note">
+        <strong>Supported questions</strong>
+        <ul>
+          <li>Limits</li>
+          <li>Deductibles</li>
+          <li>Policy periods</li>
+        </ul>
+      </aside>
+    </section>
+
+    <form class="panel upload-form" method="post" action="/stacks" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+      <label for="title">Stack name</label>
+      <input id="title" name="title" type="text" maxlength="200" placeholder="e.g. Northstar 2026 Property Bond" required>
+
+      <label for="files">Contract documents</label>
+      <label class="file-drop" for="files">
+        <span class="upload-icon" aria-hidden="true">↑</span>
+        <strong>Choose policy documents</strong>
+        <span>PDF, HTML, or TXT · up to 50 files</span>
+        <span class="selected-files" data-file-summary>No files selected</span>
+      </label>
+      <input class="visually-hidden" id="files" name="files" type="file" accept=".pdf,.html,.htm,.txt" multiple required data-file-input>
+
+      <div class="privacy-line"><span aria-hidden="true">●</span> Stored only in your local workspace</div>
+      <button class="button primary full-width" type="submit">Create contract stack</button>
+    </form>
+  </div>
+{% endblock %}

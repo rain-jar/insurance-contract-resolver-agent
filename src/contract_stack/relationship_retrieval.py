@@ -6,6 +6,7 @@ from typing import Any
 
 from openai import OpenAI
 
+from .generation import StructuredGenerator
 from .models import (
     Attribute,
     Chunk,
@@ -145,9 +146,25 @@ class BoundedRelationshipRetriever:
 
 
 class RelationshipDrivenResolver:
-    def __init__(self, client: OpenAI, *, max_added_chunks: int = 2) -> None:
-        self.base_resolver = ContractStackResolver(client)
+    def __init__(
+        self,
+        generator: StructuredGenerator | OpenAI,
+        *,
+        max_added_chunks: int = 2,
+    ) -> None:
+        self.base_resolver = ContractStackResolver(generator)
         self.expander = BoundedRelationshipRetriever(max_added_chunks=max_added_chunks)
+
+    def resolve(
+        self,
+        question: str,
+        chunks: list[Chunk],
+        initial_retrieved: list[RetrievedChunk],
+    ) -> RelationshipResolverRun:
+        initial_run = self.base_resolver.resolve(question, initial_retrieved)
+        return self.resolve_from_initial(
+            question, chunks, initial_retrieved, initial_run
+        )
 
     def resolve_from_initial(
         self,

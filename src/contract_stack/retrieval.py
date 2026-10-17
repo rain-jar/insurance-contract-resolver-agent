@@ -5,7 +5,7 @@ import json
 import math
 import re
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 from openai import OpenAI
 from rank_bm25 import BM25Plus
@@ -22,6 +22,7 @@ class OpenAIEmbedder:
         self.client = client
         self.model = model
         self.cache_dir = cache_dir
+        self.last_metadata: dict[str, Any] | None = None
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         results: list[list[float] | None] = [None] * len(texts)
@@ -34,12 +35,24 @@ class OpenAIEmbedder:
                 missing_texts.append(text)
             else:
                 results[index] = cached
+        response_model = self.model
+        usage = None
         if missing_texts:
             response = self.client.embeddings.create(model=self.model, input=missing_texts)
+            response_model = response.model
+            usage = response.usage.model_dump(mode="json") if response.usage else None
             for index, item in zip(missing_indexes, response.data, strict=True):
                 vector = list(item.embedding)
                 results[index] = vector
                 self._write(texts[index], vector)
+        self.last_metadata = {
+            "requested_model": self.model,
+            "response_model": response_model,
+            "input_count": len(texts),
+            "cache_hit_count": len(texts) - len(missing_texts),
+            "api_input_count": len(missing_texts),
+            "usage": usage,
+        }
         return [vector for vector in results if vector is not None]
 
     def _path(self, text: str) -> Path | None:

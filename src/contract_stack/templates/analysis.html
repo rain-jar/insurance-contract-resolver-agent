@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block content %}
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Contract stacks</a><span>/</span><a href="/stacks/{{ stack.id }}">{{ stack.title }}</a><span>/</span><span>Analysis</span></nav>
+
+  {% if analysis.status in ['PENDING', 'RUNNING'] %}
+    <section class="processing-card" data-status-url="/analyses/{{ analysis.id }}/status">
+      <div class="processing-orbit" aria-hidden="true"><i></i><i></i><i></i></div>
+      <p class="eyebrow">{{ analysis.status|title }}</p>
+      <h1>Tracing the contract stack</h1>
+      <p>The resolver is reading relevant provisions, following amendment relationships, and validating every citation.</p>
+      <div class="progress-track"><span></span></div>
+      <small>This page updates automatically.</small>
+    </section>
+  {% elif analysis.status == 'FAILED' %}
+    <section class="result-banner failed-result">
+      <div><p class="eyebrow">Analysis failed</p><h1>We could not complete this review.</h1><p>{{ analysis.error_message }}</p></div>
+      <div class="failure-actions">
+        <form method="post" action="/analyses/{{ analysis.id }}/retry">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button class="button" type="submit">Retry analysis</button>
+        </form>
+        <a class="button secondary" href="/stacks/{{ stack.id }}">Return to stack</a>
+      </div>
+    </section>
+  {% else %}
+    {% set result = analysis.resolution %}
+    <section class="result-banner {% if result.status == 'ANSWER' %}answer-result{% else %}abstain-result{% endif %}">
+      <div class="result-kicker"><span></span>{{ result.status.replace('_', ' ')|title }}</div>
+      <p class="question-label">Question</p>
+      <h1>{{ analysis.question }}</h1>
+      {% if result.status == 'ANSWER' %}
+        <div class="operative-answer">
+          <span>Current operative value</span>
+          <strong>{{ analysis.display_value }}</strong>
+          <small>Established by {{ result.effective_source.provision_label or result.effective_source.document_path }}</small>
+        </div>
+      {% else %}
+        <div class="operative-answer non-answer">
+          <span>Outcome</span>
+          <strong>{{ result.status.replace('_', ' ')|title }}</strong>
+          <small>{{ result.reason }}</small>
+        </div>
+      {% endif %}
+    </section>
+
+    {% if result.status == 'ANSWER' %}
+      <div class="result-grid">
+        <section class="panel chain-panel">
+          <div class="panel-title-row"><div><p class="eyebrow">Resolution path</p><h2>Amendment chain</h2></div><span>{{ analysis.chain|length }} steps</span></div>
+          <ol class="timeline">
+            {% for step in analysis.chain %}
+              <li class="{% if loop.last %}current{% endif %}">
+                <span class="timeline-node">{{ loop.index }}</span>
+                <div>
+                  <small>{{ step.operation.replace('_', ' ')|title }}</small>
+                  <strong>{{ step.source }}</strong>
+                  {% if step.display_value %}<p>{{ step.display_value }}</p>{% endif %}
+                </div>
+                {% if loop.last %}<span class="current-tag">Operative</span>{% endif %}
+              </li>
+            {% endfor %}
+          </ol>
+        </section>
+
+        <section class="evidence-column">
+          <div class="section-heading evidence-heading"><div><p class="eyebrow">Source-grounded</p><h2>Supporting evidence</h2></div></div>
+          {% for evidence in result.evidence %}
+            <article class="evidence-card">
+              <div class="evidence-meta"><strong>{{ evidence.document_path }}</strong><span>{{ evidence.locator }}</span></div>
+              <blockquote>“{{ evidence.quote }}”</blockquote>
+              <small>{{ evidence.extraction_method|title }} extraction</small>
+            </article>
+          {% endfor %}
+        </section>
+      </div>
+    {% endif %}
+
+    <section class="reason-card">
+      <p class="eyebrow">Resolver explanation</p>
+      <p>{{ result.reason }}</p>
+    </section>
+
+    <details class="technical-details">
+      <summary>Technical audit details</summary>
+      <pre>{{ analysis.technical_json }}</pre>
+    </details>
+  {% endif %}
+{% endblock %}

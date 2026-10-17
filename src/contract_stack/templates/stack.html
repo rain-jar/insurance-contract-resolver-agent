@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+  <nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Contract stacks</a><span>/</span><span>{{ stack.title }}</span></nav>
+  <section class="page-heading stack-heading">
+    <div>
+      <p class="eyebrow">Contract stack</p>
+      <h1>{{ stack.title }}</h1>
+      <p>{{ stack.documents|length }} source document{% if stack.documents|length != 1 %}s{% endif %} · Created {{ stack.created_at_utc[:10] }}</p>
+    </div>
+    <a class="button quiet" href="/stacks/new">New stack</a>
+  </section>
+
+  <div class="workspace-grid">
+    <section class="panel question-panel">
+      <p class="eyebrow">Resolve a provision</p>
+      <h2>What do you need to know?</h2>
+      <form method="post" action="/stacks/{{ stack.id }}/analyses">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <label class="visually-hidden" for="question">Question</label>
+        <textarea id="question" name="question" maxlength="2000" rows="4" placeholder="What is the current On Premises single loss limit?" required></textarea>
+        <div class="prompt-row">
+          <span>Try a limit, deductible, or policy-period question.</span>
+          <button class="button primary" type="submit">Analyze stack <span aria-hidden="true">→</span></button>
+        </div>
+      </form>
+    </section>
+
+    <aside class="panel documents-panel">
+      <div class="panel-title-row"><h2>Documents</h2><span>{{ stack.documents|length }}</span></div>
+      <ul class="document-list">
+        {% for document in stack.documents %}
+          <li>
+            <span class="file-type">{{ document.display_name.rsplit('.', 1)[-1]|upper }}</span>
+            <div><strong>{{ document.display_name }}</strong><small>{{ (document.byte_size / 1024)|round(1) }} KB</small></div>
+          </li>
+        {% endfor %}
+      </ul>
+    </aside>
+  </div>
+
+  <section class="section-heading history-heading">
+    <div><p class="eyebrow">Audit trail</p><h2>Analysis history</h2></div>
+  </section>
+  {% if analyses %}
+    <div class="history-list">
+      {% for analysis in analyses %}
+        <a href="/analyses/{{ analysis.id }}" class="history-row">
+          <span class="status-dot {{ analysis.status|lower }}" aria-hidden="true"></span>
+          <div><strong>{{ analysis.question }}</strong><small>{{ analysis.created_at_utc[:19].replace('T', ' ') }}</small></div>
+          <span class="status-pill {{ analysis.status|lower }}">{{ analysis.status.replace('_', ' ')|title }}</span>
+          <span class="card-arrow" aria-hidden="true">→</span>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="inline-empty">No analyses yet. Ask your first question above.</div>
+  {% endif %}
+
+  <details class="danger-zone">
+    <summary>Stack settings</summary>
+    <div>
+      <p>Deleting this stack permanently removes its documents, cached derivatives, and analysis history.</p>
+      <form method="post" action="/stacks/{{ stack.id }}/delete" data-confirm="Delete this contract stack and all of its local data?">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <button class="button danger" type="submit">Delete contract stack</button>
+      </form>
+    </div>
+  </details>
+{% endblock %}
